@@ -1,0 +1,32 @@
+[
+    {
+        "id": "20261031_152918",
+        "nombre": "Arbol Gini Prof 3)",
+        "fecha": "2026-10-31 15:29",
+        "dataset": "datos_sucios_prueba.csv",
+        "variable_objetivo": "abandono_cliente",
+        "variables_predictoras": "edad_cliente, ingreso_mensual, compras_mes, metodo_pago",
+        "criterio": "gini",
+        "profundidad_max": 3,
+        "division_prueba": "25%",
+        "exactitud": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "archivo_pkl": "arbol_20261031_152918.pkl"
+    },
+    {
+        "id": "20261031_153016",
+        "nombre": "Arbol Entropia",
+        "fecha": "2026-10-31 15:30",
+        "dataset": "datos_sucios_prueba.csv",
+        "variable_objetivo": "abandono_cliente",
+        "variables_predictoras": "edad_cliente, ingreso_mensual, compras_mes, metodo_pago",
+        "criterio": "entropy",
+        "profundidad_max": 3,
+        "division_prueba": "25%",
+        "exactitud": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "archivo_pkl": "arbol_20261031_153016.pkl"
+    }
+]
