@@ -1,0 +1,21 @@
+ID Cliente;Edad_Cliente;Ingreso Mensual;Compras_Mes;Metodo Pago;Abandono_Cliente
+1;25;650000;4;Tarjeta;No
+2;34;850000;7;Transferencia;No
+2;34;850000;7;Transferencia;No
+3;;450000;2;Efectivo;Si
+4;42;1200000;9;Tarjeta;No
+5;29;;1;Efectivo;Si
+6;150;720000;5;Transferencia;No
+7;31;98000000;6;Tarjeta;No
+8;22;380000;1;;Si
+9;45;1100000;8;Tarjeta;No
+10;38;920000;;Transferencia;No
+11;27;540000;3;Efectivo;Si
+12;51;1350000;10;Tarjeta;No
+13;24;410000;2;Efectivo;Si
+14;;600000;4;Transferencia;No
+15;33;780000;6;Tarjeta;No
+15;33;780000;6;Tarjeta;No
+16;28;510000;2;Efectivo;Si
+17;40;1050000;7;Tarjeta;No
+18;19;320000;1;Efectivo;Si
