@@ -2,18 +2,13 @@
 
 ¡Bienvenido! Este proyecto es una aplicación web interactiva inspirada en **Orange Data Mining**[cite: 1]. Permite a cualquier usuario subir un archivo de datos (`.csv`), limpiarlo automáticamente sin saber programar y entrenar modelos de Inteligencia Artificial (Árboles de Decisión) de forma 100% visual[cite: 1].
 
-**Desarrollado por:** 
+**Equipo de Desarrollo y Roles:** 
 
-**Franco Fajardo** — Desarrollador Core y Arquitectura del Sistema (Backend & Integración Web):
-Responsabilidad principal: Construir la estructura del proyecto y programar desde cero los módulos funcionales en Python y su conexión con la aplicación web según los requerimientos del profesor.   
+* **Franco Fajardo — Desarrollo Core, Procesamiento de Datos y Funcionalidad Web:**  
+  Encargado de la arquitectura base, programación de los motores de minería de datos en Python (`validador.py`, `limpieza.py`, `arbol_decision.py`) y estructuración funcional de la plataforma web en Streamlit según los requerimientos del sistema.
 
-**Tareas en el proyecto:** Desarrollo de los algoritmos de validación (validador.py), limpieza automática (limpieza.py), entrenamiento y persistencia de modelos (arbol_decision.py), lógica funcional de las vistas en Streamlit (web/app.py) y creación de los próximos módulos (Reglas de Asociación, Informes y Dashboard).   
-
-  
-**Erick Mamani** — Encargado de Interfaz (UI/UX), QA (Validación) y Mejora Continua:
-Responsabilidad principal: Tomar los módulos funcionales construidos por Franco, auditarlos, refinar la experiencia visual del usuario y documentar técnicamente el código.   
-  
-**Tareas en el proyecto:** Diseño y estilizado visual mediante hojas de estilo (web/estilos.css) y componentes HTML/CSS en Streamlit, pruebas de validación de calidad, optimización de gráficos interactivos y redacción de documentación interna (docstrings y comentarios explicativos en todo el código).
+* **Erick Mamani — Diseño de Interfaz (UI/UX), Validación y Mejora Continua:**  
+  Encargado del diseño visual personalizado (`estilos.css`), refinamiento de la experiencia de usuario en la interfaz gráfica, validación de pruebas (QA), optimización visual de métricas y documentación técnica del código fuente.
 
 ---
 
@@ -37,7 +32,12 @@ mineria-datos-franco-erick/
 │   ├── validador.py           # Revisa que el CSV sea válido y detecta su separador
 │   ├── limpieza.py            # Repara vacíos, borra duplicados y corrige extremos
 │   └── arbol_decision.py      # Entrena el Árbol de Decisión, calcula notas y guarda modelos
-│
+├── docs/
+│   └── capturas/              # Fotos de evidencia tomadas por Erick
+│       ├── rf1_carga.png
+│       ├── rf2_limpieza.png
+│       ├── rf3_arbol.png
+│       └── rf3_comparativa.png
 ├── web/                       # PANTALLA: La interfaz gráfica amigable
 │   └── app.py                 # Página web interactiva creada con Streamlit (por pestañas)
 │
@@ -46,18 +46,28 @@ mineria-datos-franco-erick/
 │   └── modelos/               # Historial de modelos guardados (.json y .pkl)
 │
 ├── requirements.txt           # Lista de librerías que usa el proyecto
-└── README.md                  # Esta guía de uso
+├── README.md                      # Portada e instrucciones de instalación
+└── VALIDACION_QA.md               # Reporte oficial de pruebas (Checklist del profesor)
 ```
 
 ---
 
 ##  Herramientas que utilizamos
 
- **Python 3** como lenguaje principal de principio a fin[cite: 1, 2].
- **Streamlit** para crear la interfaz web rápida y por pestañas.
- **Pandas y NumPy** para limpiar y ordenar las tablas de datos[cite: 3].
- **Scikit-Learn** para entrenar los Árboles de Decisión[cite: 3].
- **Plotly y Matplotlib** para dibujar los gráficos interactivos y el mapa del árbol[cite: 3].
+**Python 3 (Lenguaje de programación):** Es la base del proyecto; lo elegimos por ser el estándar en Minería de Datos.   
+
+**Streamlit + CSS (Framework web y hojas de estilo):** Crean la página web y su diseño (estilos.css). Los elegimos en vez de Flask o FastAPI porque muestran tablas y gráficos de datos al instante.   
+
+**Pandas y NumPy (Librerías de análisis de datos):** Funcionan como un Excel dentro del código; las usamos para leer el CSV, limpiar nulos, borrar repetidos y corregir outliers.
+
+**Scikit-Learn (Librería de Machine Learning):** Es el motor de inteligencia artificial; lo usamos para entrenar el Árbol de Decisión (Gini y Entropía) y calcular sus métricas.   
+
+**Matplotlib y Plotly (Librerías de gráficos):** Matplotlib dibuja el esquema del árbol y Plotly crea los gráficos interactivos (Matriz de Confusión y barras comparativas).
+
+**Joblib y JSON (Formatos de almacenamiento):** Joblib guarda el modelo entrenado en un archivo .pkl y JSON (registro_modelos.json) guarda la lista de puntajes e historial en disco.   
+
+**Git y GitHub (Control de versiones y repositorio en la nube):** Los usamos para trabajar los dos en ramas separadas (develop y main), uniendo tu código base con el diseño y las pruebas QA de Erick.
+
 
 ---
 

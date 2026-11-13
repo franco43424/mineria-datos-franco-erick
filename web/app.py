@@ -8,14 +8,27 @@ de forma visual, interactiva y sin necesidad de escribir código.
 
 import sys
 import os
+import io
+import importlib
+
 # Asegurar que el intérprete de Python encuentre el paquete 'analisis' ubicando la raíz del proyecto
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+RUTA_RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if RUTA_RAIZ not in sys.path:
+    sys.path.append(RUTA_RAIZ)
 
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Importación de los módulos de lógica de negocio (Backend)
+# Importación y recarga forzada de los módulos de lógica de negocio (Backend)
+# Evita que Streamlit retenga versiones antiguas en caché de memoria
+import analisis.validador
+import analisis.limpieza
+import analisis.arbol_decision
+importlib.reload(analisis.validador)
+importlib.reload(analisis.limpieza)
+importlib.reload(analisis.arbol_decision)
+
 from analisis.validador import validar_y_cargar_csv
 from analisis.limpieza import limpiar_dataset_automatico
 from analisis.arbol_decision import (
@@ -35,63 +48,39 @@ st.set_page_config(
 def cargar_estilos_css(nombre_archivo="estilos.css"):
     """
     Lee una hoja de estilos CSS externa ubicada en el mismo directorio que app.py
-    y la inyecta en el DOM de la aplicación Streamlit.
+    y la inyecta en el DOM de la aplicación Streamlit junto con reglas de contraste.
     """
     ruta_css = os.path.join(os.path.dirname(__file__), nombre_archivo)
+    css_contenido = ""
     if os.path.exists(ruta_css):
         with open(ruta_css, "r", encoding="utf-8") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+            css_contenido = f.read()
+
+    # Corrección de contraste para evitar letras blancas invisibles en Modo Oscuro del navegador
+    css_contraste = """
+    .stApp [data-testid="stMainBlockContainer"] p,
+    .stApp [data-testid="stMainBlockContainer"] span,
+    .stApp [data-testid="stMainBlockContainer"] label,
+    .stApp [data-testid="stMainBlockContainer"] h1,
+    .stApp [data-testid="stMainBlockContainer"] h2,
+    .stApp [data-testid="stMainBlockContainer"] h3,
+    .stApp [data-testid="stMainBlockContainer"] h4,
+    .stApp [data-testid="stMainBlockContainer"] h5,
+    .stTabs [data-baseweb="tab"] p {
+        color: #1E293B !important;
+    }
+    .hero-banner h1, .hero-banner p, .hero-banner span, .hero-banner div,
+    button[kind="primary"] p, button[kind="primary"] span {
+        color: #FFFFFF !important;
+    }
+    """
+    st.markdown(f"<style>{css_contenido}\n{css_contraste}</style>", unsafe_allow_html=True)
 
 # Aplicar los estilos visuales desde el archivo externo
 cargar_estilos_css()
 
-# ==========================================
-# BARRA LATERAL (MONITOREO DE FLUJO Y GUÍA)
-# ==========================================
-# La barra lateral mantiene el contexto del flujo de trabajo actual apoyándose en 'st.session_state'.
-with st.sidebar:
-    st.markdown("## Panel de Control")
-    st.caption("Desarrollado por Franco Fajardo y Erick Mamani")
-    st.divider()
-
-    st.markdown("**ESTADO DEL PIPELINE**")
-    # Verificación del estado en memoria caché de la sesión actual
-    tiene_archivo = "df_original" in st.session_state
-    tiene_limpio = "df_limpio" in st.session_state
-    tiene_arbol = "ultimo_arbol" in st.session_state
-
-    # Indicadores de progreso tipo tarjeta con badges de colores (definidos en estilos.css)
-    st.markdown(f"""
-        <div class="step-card">
-            <span>1. Ingesta de CSV</span>
-            <span class="{'badge-ok' if tiene_archivo else 'badge-wait'}">{'LISTO' if tiene_archivo else 'PENDIENTE'}</span>
-        </div>
-        <div class="step-card">
-            <span>2. Limpieza de Datos</span>
-            <span class="{'badge-ok' if tiene_limpio else 'badge-wait'}">{'LISTO' if tiene_limpio else 'PENDIENTE'}</span>
-        </div>
-        <div class="step-card">
-            <span>3. Modelo Predictivo</span>
-            <span class="{'badge-ok' if tiene_arbol else 'badge-wait'}">{'LISTO' if tiene_arbol else 'PENDIENTE'}</span>
-        </div>
-    """, unsafe_allow_html=True)
-
-    if tiene_archivo:
-        st.divider()
-        st.caption("ARCHIVO EN MEMORIA")
-        st.markdown(
-            f"<div class='active-file-box'>{st.session_state.get('nombre_dataset', '')}</div>",
-            unsafe_allow_html=True
-        )
-
-    st.divider()
-    with st.expander("Guía rápida del flujo"):
-        st.markdown(
-            "1. **Carga y Validación:** Importa el dataset en bruto.\n"
-            "2. **Preprocesamiento:** Imputación de nulos y control de valores atípicos.\n"
-            "3. **Modelado:** Configuración y entrenamiento del Árbol de Decisión.\n"
-            "4. **Evaluación:** Registro histórico y comparativa de métricas."
-        )
+# Reservamos el contenedor de la barra lateral para actualizarlo al final del script
+contenedor_sidebar = st.sidebar.empty()
 
 # ==========================================
 # ENCABEZADO PRINCIPAL (HERO BANNER)
@@ -129,9 +118,35 @@ with tab1:
         help="Límite de tamaño: 50 MB. Estructura mínima requerida: 2 columnas."
     )
 
-    if archivo is None:
-        st.info("Sube un archivo CSV en el panel superior para habilitar las herramientas de preprocesamiento y modelado.")
-    else:
+    # Botón auxiliar para cargar directamente el dataset de prueba si no se ha subido archivo
+    if archivo is None and "df_original" not in st.session_state:
+        if st.button("Cargar dataset de prueba (datos_sucios_prueba.csv)", type="secondary"):
+            ruta_prueba = os.path.join(RUTA_RAIZ, "storage", "datasets", "datos_sucios_prueba.csv")
+            os.makedirs(os.path.dirname(ruta_prueba), exist_ok=True)
+            contenido_demo = (
+                "ID Cliente;Edad Cliente;Ingreso Mensual;Compras Mes;Metodo Pago;Abandono Cliente\n"
+                "1;25;450000;3;Tarjeta;No\n"
+                "2;34;620000;5;Transferencia;No\n"
+                "2;34;620000;5;Transferencia;No\n"
+                "3;150;510000;2;Efectivo;Si\n"
+                "4;;480000;1;Tarjeta;Si\n"
+                "5;29;590000;4;;No\n"
+                "6;42;8500000;6;Transferencia;No\n"
+                "7;31;530000;2;Efectivo;Si\n"
+                "8;27;490000;3;Tarjeta;No\n"
+                "9;38;610000;4;Transferencia;No\n"
+                "10;22;410000;1;Efectivo;Si\n"
+                "11;45;720000;5;Tarjeta;No\n"
+                "12;33;550000;2;Efectivo;Si\n"
+            )
+            with open(ruta_prueba, "w", encoding="utf-8") as f_demo:
+                f_demo.write(contenido_demo)
+            archivo_memoria = io.BytesIO(contenido_demo.encode("utf-8"))
+            archivo_memoria.name = "datos_sucios_prueba.csv"
+            archivo_memoria.size = len(contenido_demo.encode("utf-8"))
+            archivo = archivo_memoria
+
+    if archivo is not None:
         # Invocación al módulo validador del backend
         exito, mensaje, df, meta = validar_y_cargar_csv(archivo)
         if not exito:
@@ -143,21 +158,29 @@ with tab1:
                 
             # Almacenamiento en el estado de la sesión para persistencia entre pestañas
             st.session_state["df_original"] = df
+            st.session_state["meta_dataset"] = meta
             st.session_state["nombre_dataset"] = meta["nombre"]
 
-            st.markdown('<div class="section-title">Diagnóstico técnico del archivo</div>', unsafe_allow_html=True)
-            # Visualización de metadatos mediante tarjetas de métricas con relieve
-            col1, col2, col3, col4, col5 = st.columns(5)
-            col1.metric("Peso en disco", meta["tamano_kb"], help="Tamaño físico del archivo.")
-            col2.metric("Codificación", meta["codificacion"], help="Estándar de caracteres detectado.")
-            col3.metric("Delimitador", meta["separador"], help="Carácter separador de campos identificado.")
-            col4.metric("Registros (Filas)", meta["filas"], help="Total de observaciones en el dataset.")
-            col5.metric("Variables (Columnas)", meta["columnas"], help="Total de atributos por registro.")
+    # Renderizar resultados si ya existe un dataset cargado en sesión
+    if "df_original" in st.session_state and "meta_dataset" in st.session_state:
+        df_mostrar_raw = st.session_state["df_original"]
+        meta = st.session_state["meta_dataset"]
 
-            st.markdown('<div class="section-title">Exploración de datos crudos (Raw Data)</div>', unsafe_allow_html=True)
-            with st.container(border=True):
-                st.caption("Vista previa sin alteraciones. Los valores faltantes se visualizan como 'None' y serán tratados en la siguiente etapa.")
-                st.dataframe(df, width="stretch")
+        st.markdown('<div class="section-title">Diagnóstico técnico del archivo</div>', unsafe_allow_html=True)
+        # Visualización de metadatos mediante tarjetas de métricas con relieve
+        col1, col2, col3, col4, col5 = st.columns(5)
+        col1.metric("Peso en disco", meta["tamano_kb"], help="Tamaño físico del archivo.")
+        col2.metric("Codificación", meta["codificacion"], help="Estándar de caracteres detectado.")
+        col3.metric("Delimitador", meta["separador"], help="Carácter separador de campos identificado.")
+        col4.metric("Registros (Filas)", meta["filas"], help="Total de observaciones en el dataset.")
+        col5.metric("Variables (Columnas)", meta["columnas"], help="Total de atributos por registro.")
+
+        st.markdown('<div class="section-title">Exploración de datos crudos (Raw Data)</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.caption("Vista previa sin alteraciones. Los valores faltantes se visualizan como 'None' y serán tratados en la siguiente etapa.")
+            st.dataframe(df_mostrar_raw, width="stretch")
+    elif archivo is None:
+        st.info("Sube un archivo CSV en el panel superior para habilitar las herramientas de preprocesamiento y modelado.")
 
 # ==========================================
 # PESTAÑA 2: LIMPIEZA AUTOMÁTICA (Preparación de Datos)
@@ -401,6 +424,7 @@ with tab3:
                 if c_save2.button("Guardar en el registro", type="primary", width="stretch"):
                     reg = guardar_modelo(nombre_modelo, res, st.session_state.get("nombre_dataset", "dataset.csv"))
                     st.toast(f"Modelo '{reg['nombre']}' almacenado en el historial.", icon="💾")
+                    st.rerun()
 
 # ==========================================
 # PESTAÑA 4: GESTIÓN Y COMPARACIÓN DE MODELOS
@@ -474,3 +498,48 @@ with tab4:
                 eliminar_modelo_guardado(id_a_eliminar)
                 st.toast("Registro y archivo binario eliminados.", icon="🗑️")
                 st.rerun()
+
+# ==========================================
+# BARRA LATERAL (ACTUALIZACIÓN EN TIEMPO REAL)
+# ==========================================
+with contenedor_sidebar.container():
+    st.markdown("## Panel de Control")
+    st.caption("Desarrollado por Franco Fajardo y Erick Mamani")
+    st.divider()
+
+    st.markdown("**ESTADO DEL PIPELINE**")
+    tiene_archivo = "df_original" in st.session_state
+    tiene_limpio = "df_limpio" in st.session_state
+    tiene_arbol = "ultimo_arbol" in st.session_state
+
+    st.markdown(f"""
+        <div class="step-card">
+            <span>1. Ingesta de CSV</span>
+            <span class="{'badge-ok' if tiene_archivo else 'badge-wait'}">{'LISTO' if tiene_archivo else 'PENDIENTE'}</span>
+        </div>
+        <div class="step-card">
+            <span>2. Limpieza de Datos</span>
+            <span class="{'badge-ok' if tiene_limpio else 'badge-wait'}">{'LISTO' if tiene_limpio else 'PENDIENTE'}</span>
+        </div>
+        <div class="step-card">
+            <span>3. Modelo Predictivo</span>
+            <span class="{'badge-ok' if tiene_arbol else 'badge-wait'}">{'LISTO' if tiene_arbol else 'PENDIENTE'}</span>
+        </div>
+    """, unsafe_allow_html=True)
+
+    if tiene_archivo:
+        st.divider()
+        st.caption("ARCHIVO EN MEMORIA")
+        st.markdown(
+            f"<div class='active-file-box'>{st.session_state.get('nombre_dataset', '')}</div>",
+            unsafe_allow_html=True
+        )
+
+    st.divider()
+    with st.expander("Guía rápida del flujo"):
+        st.markdown(
+            "1. **Carga y Validación:** Importa el dataset en bruto.\n"
+            "2. **Preprocesamiento:** Imputación de nulos y control de valores atípicos.\n"
+            "3. **Modelado:** Configuración y entrenamiento del Árbol de Decisión.\n"
+            "4. **Evaluación:** Registro histórico y comparativa de métricas."
+        )
