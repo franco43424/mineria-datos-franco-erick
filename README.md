@@ -4,19 +4,16 @@
 
 **Desarrollado por:** 
 
-Franco Fajardo — Desarrollador Core y Arquitectura del Sistema (Backend & Integración Web):
+**Franco Fajardo** — Desarrollador Core y Arquitectura del Sistema (Backend & Integración Web):
 Responsabilidad principal: Construir la estructura del proyecto y programar desde cero los módulos funcionales en Python y su conexión con la aplicación web según los requerimientos del profesor.   
-Software_de_Administracion_de_Mineria_de_Datos.pdf
 
-Tareas en el proyecto: Desarrollo de los algoritmos de validación (validador.py), limpieza automática (limpieza.py), entrenamiento y persistencia de modelos (arbol_decision.py), lógica funcional de las vistas en Streamlit (web/app.py) y creación de los próximos módulos (Reglas de Asociación, Informes y Dashboard).   
-Software_de_Administracion_de_Mineria_de_Datos.pdf
+**Tareas en el proyecto:** Desarrollo de los algoritmos de validación (validador.py), limpieza automática (limpieza.py), entrenamiento y persistencia de modelos (arbol_decision.py), lógica funcional de las vistas en Streamlit (web/app.py) y creación de los próximos módulos (Reglas de Asociación, Informes y Dashboard).   
 
   
-Erick Mamani — Encargado de Interfaz (UI/UX), QA (Validación) y Mejora Continua:
+**Erick Mamani** — Encargado de Interfaz (UI/UX), QA (Validación) y Mejora Continua:
 Responsabilidad principal: Tomar los módulos funcionales construidos por Franco, auditarlos, refinar la experiencia visual del usuario y documentar técnicamente el código.   
-Captura de pantalla 2026-11-13 a la(s) 2.27.55 a.m..jpg
   
-Tareas en el proyecto: Diseño y estilizado visual mediante hojas de estilo (web/estilos.css) y componentes HTML/CSS en Streamlit, pruebas de validación de calidad, optimización de gráficos interactivos y redacción de documentación interna (docstrings y comentarios explicativos en todo el código).
+**Tareas en el proyecto:** Diseño y estilizado visual mediante hojas de estilo (web/estilos.css) y componentes HTML/CSS en Streamlit, pruebas de validación de calidad, optimización de gráficos interactivos y redacción de documentación interna (docstrings y comentarios explicativos en todo el código).
 
 ---
 
