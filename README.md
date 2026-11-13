@@ -55,7 +55,6 @@ mineria-datos-franco-erick/
 ##  Herramientas que utilizamos
 
 **Python 3 (Lenguaje de programación):** Es la base del proyecto; lo elegimos por ser el estándar en Minería de Datos.   
-Captura de pantalla 2026-11-13 a la(s) 5.34.09 p.m..png
 
 **Streamlit + CSS (Framework web y hojas de estilo):** Crean la página web y su diseño (estilos.css). Los elegimos en vez de Flask o FastAPI porque muestran tablas y gráficos de datos al instante.   
 
