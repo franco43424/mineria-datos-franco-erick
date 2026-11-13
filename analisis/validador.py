@@ -8,6 +8,7 @@ y tenga una estructura tabular válida antes de iniciar cualquier análisis o mo
 
 import pandas as pd
 import io
+import csv
 
 def validar_y_cargar_csv(archivo_subido):
     """
@@ -47,10 +48,10 @@ def validar_y_cargar_csv(archivo_subido):
     # especiales (tildes, ñ) se corrompen, arruinando las variables categóricas de texto.
     codificacion_detectada = None
     texto_decodificado = None
-    for enc in ['utf-8', 'latin-1', 'cp1252']:
+    for enc in ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252']:
         try:
             texto_decodificado = contenido_bytes.decode(enc)
-            codificacion_detectada = enc
+            codificacion_detectada = 'utf-8' if enc == 'utf-8-sig' else enc
             break  # Si decodifica sin lanzar error, asume que es la codificación correcta
         except UnicodeDecodeError:
             continue
@@ -59,23 +60,37 @@ def validar_y_cargar_csv(archivo_subido):
         return False, "Error: No se pudo reconocer la codificación de caracteres del archivo.", None, metadatos
 
     # 4. Detectar y validar separador (coma, punto y coma, tabulación o pipe)
-    # Los CSV pueden usar distintos delimitadores según el idioma del sistema operativo (ej. Excel en español usa ';').
-    # Esta heurística lee la primera fila (encabezados) y cuenta qué separador es el dominante.
-    primera_linea = texto_decodificado.splitlines()[0] if texto_decodificado.splitlines() else ""
-    separadores_posibles = [',', ';', '\t', '|']
-    # Contamos cuál separador aparece más veces en el encabezado
+    # Filtramos líneas en blanco iniciales para asegurar que leemos el encabezado real
+    lineas_validas = [linea.strip() for linea in texto_decodificado.splitlines() if linea.strip()]
+    if not lineas_validas:
+        return False, "Error: El archivo CSV no contiene líneas con datos.", None, metadatos
+
+    primera_linea = lineas_validas[0]
+    separadores_posibles = [',', ';', '\t', '|', ':']
     separador_detectado = max(separadores_posibles, key=lambda s: primera_linea.count(s))
     
     if primera_linea.count(separador_detectado) == 0:
-        # Si no encontró ninguno claro, usamos coma por defecto (estándar internacional)
-        separador_detectado = ','
+        try:
+            dialecto = csv.Sniffer().sniff("\n".join(lineas_validas[:5]))
+            separador_detectado = dialecto.delimiter
+        except Exception:
+            separador_detectado = ','
 
     # 5. Intentar cargar el DataFrame con Pandas usando lo detectado
     # io.StringIO simula un archivo de texto en memoria a partir del string decodificado,
     # permitiendo que pd.read_csv lo procese como si fuera un archivo físico.
+    texto_limpio = "\n".join(lineas_validas)
     try:
-        buffer_texto = io.StringIO(texto_decodificado)
+        buffer_texto = io.StringIO(texto_limpio)
         df = pd.read_csv(buffer_texto, sep=separador_detectado)
+        # Respaldo automático si el separador elegido dejó todo en 1 sola columna
+        if len(df.columns) < 2:
+            for sep_alt in [';', ',', '\t', '|']:
+                df_prueba = pd.read_csv(io.StringIO(texto_limpio), sep=sep_alt)
+                if len(df_prueba.columns) >= 2:
+                    df = df_prueba
+                    separador_detectado = sep_alt
+                    break
     except Exception as e:
         return False, f"Error al estructurar las columnas del CSV: {str(e)}", None, metadatos
 
