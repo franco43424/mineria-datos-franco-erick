@@ -40,6 +40,7 @@ mineria-datos-franco-erick/
 │       └── rf3_comparativa.png
 ├── web/                       # PANTALLA: La interfaz gráfica amigable
 │   └── app.py                 # Página web interactiva creada con Streamlit (por pestañas)
+│   └── estilo.css
 │
 ├── storage/                   # MEMORIA: Donde se guardan los archivos y modelos
 │   ├── datasets/              # CSV de prueba listos para usar
