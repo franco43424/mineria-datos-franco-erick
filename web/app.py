@@ -98,7 +98,7 @@ with st.sidebar:
 # ==========================================
 st.markdown("""
     <div class="hero-banner">
-        <div class="logo-container">
+        <div class="hero-badge">Suite Analítica • Machine Learning</div>
         <h1>Plataforma de Minería de Datos</h1>
         <p>Entorno interactivo para validación de calidad de datos, preprocesamiento estadístico automatizado y entrenamiento de Árboles de Decisión.</p>
     </div>
@@ -372,14 +372,14 @@ with tab3:
                         "Contraste entre las etiquetas reales (eje Y) y las predicciones del modelo (eje X). "
                         "La diagonal principal concentra los aciertos."
                     )
-                    # Mapa de calor interactivo con Plotly en gama cromática Índigo/Azul
+                    # Mapa de calor interactivo con Plotly en gama cromática Purple-Blue ('PuBu')
                     fig_cm = px.imshow(
                         res["matriz_confusion"],
                         labels=dict(x="Predicción del Modelo", y="Valor Real (Ground Truth)", color="Registros"),
                         x=res["clases"],
                         y=res["clases"],
                         text_auto=True,
-                        color_continuous_scale="Indigo"
+                        color_continuous_scale="PuBu"
                     )
                     fig_cm.update_layout(
                         margin=dict(l=20, r=20, t=20, b=20),
