@@ -54,11 +54,21 @@ mineria-datos-franco-erick/
 
 ##  Herramientas que utilizamos
 
- **Python 3** como lenguaje principal de principio a fin[cite: 1, 2].
- **Streamlit** para crear la interfaz web rápida y por pestañas.
- **Pandas y NumPy** para limpiar y ordenar las tablas de datos[cite: 3].
- **Scikit-Learn** para entrenar los Árboles de Decisión[cite: 3].
- **Plotly y Matplotlib** para dibujar los gráficos interactivos y el mapa del árbol[cite: 3].
+**Python 3 (Lenguaje de programación):** Es la base del proyecto; lo elegimos por ser el estándar en Minería de Datos.   
+Captura de pantalla 2026-11-13 a la(s) 5.34.09 p.m..png
+
+**Streamlit + CSS (Framework web y hojas de estilo):** Crean la página web y su diseño (estilos.css). Los elegimos en vez de Flask o FastAPI porque muestran tablas y gráficos de datos al instante.   
+
+**Pandas y NumPy (Librerías de análisis de datos):** Funcionan como un Excel dentro del código; las usamos para leer el CSV, limpiar nulos, borrar repetidos y corregir outliers.
+
+**Scikit-Learn (Librería de Machine Learning):** Es el motor de inteligencia artificial; lo usamos para entrenar el Árbol de Decisión (Gini y Entropía) y calcular sus métricas.   
+
+**Matplotlib y Plotly (Librerías de gráficos):** Matplotlib dibuja el esquema del árbol y Plotly crea los gráficos interactivos (Matriz de Confusión y barras comparativas).
+
+**Joblib y JSON (Formatos de almacenamiento):** Joblib guarda el modelo entrenado en un archivo .pkl y JSON (registro_modelos.json) guarda la lista de puntajes e historial en disco.   
+
+**Git y GitHub (Control de versiones y repositorio en la nube):** Los usamos para trabajar los dos en ramas separadas (develop y main), uniendo tu código base con el diseño y las pruebas QA de Erick.
+
 
 ---
 
