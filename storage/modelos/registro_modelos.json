@@ -28,5 +28,35 @@
         "precision": 1.0,
         "recall": 1.0,
         "archivo_pkl": "arbol_20261031_153016.pkl"
+    },
+    {
+        "id": "20261113_194827",
+        "nombre": "prueba 1",
+        "fecha": "2026-11-13 19:48",
+        "dataset": "datos_sucios_prueba.csv",
+        "variable_objetivo": "abandono_cliente",
+        "variables_predictoras": "edad_cliente, ingreso_mensual, compras_mes, metodo_pago",
+        "criterio": "gini",
+        "profundidad_max": 3,
+        "division_prueba": "25%",
+        "exactitud": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "archivo_pkl": "arbol_20261113_194827.pkl"
+    },
+    {
+        "id": "20261113_202244",
+        "nombre": "prueba 2",
+        "fecha": "2026-11-13 20:22",
+        "dataset": "dataset_mineria_datos.csv",
+        "variable_objetivo": "calificacion_servicio",
+        "variables_predictoras": "nombre, edad, genero, ciudad, carrera, ingreso_mensual, producto, precio_unitario, cantidad, metodo_pago, fecha_compra",
+        "criterio": "gini",
+        "profundidad_max": 3,
+        "division_prueba": "25%",
+        "exactitud": 0.2911,
+        "precision": 0.1906,
+        "recall": 0.2911,
+        "archivo_pkl": "arbol_20261113_202244.pkl"
     }
 ]

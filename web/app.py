@@ -9,6 +9,7 @@ de forma visual, interactiva y sin necesidad de escribir código.
 import sys
 import os
 import io
+import base64
 import importlib
 
 # Asegurar que el intérprete de Python encuentre el paquete 'analisis' ubicando la raíz del proyecto
@@ -38,17 +39,17 @@ from analisis.arbol_decision import (
     eliminar_modelo_guardado
 )
 
-# Configuración principal de la página web (Diseño ancho y barra lateral expandida)
+# Configuración principal de la página web
 st.set_page_config(
     page_title="Plataforma de Minería de Datos",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 def cargar_estilos_css(nombre_archivo="estilos.css"):
     """
-    Lee una hoja de estilos CSS externa ubicada en el mismo directorio que app.py
-    y la inyecta en el DOM de la aplicación Streamlit junto con reglas de contraste.
+    Lee una hoja de estilos CSS externa ubicada en el mismo directorio que app.py,
+    convierte las imágenes locales a Base64 e inyecta los estilos y fondos personalizados.
     """
     ruta_css = os.path.join(os.path.dirname(__file__), nombre_archivo)
     css_contenido = ""
@@ -56,25 +57,59 @@ def cargar_estilos_css(nombre_archivo="estilos.css"):
         with open(ruta_css, "r", encoding="utf-8") as f:
             css_contenido = f.read()
 
-    # Corrección de contraste para evitar letras blancas invisibles en Modo Oscuro del navegador
+    css_imagenes = ""
+
+    # 1. Ícono animado de limpieza para el recuadro de subida de archivos (web/assets/17364836.png)
+    ruta_icono = os.path.join(os.path.dirname(__file__), "assets", "17364836.png")
+    if os.path.exists(ruta_icono):
+        with open(ruta_icono, "rb") as img_file:
+            icono_base64 = base64.b64encode(img_file.read()).decode()
+
+        css_imagenes += f"""
+        section[data-testid="stFileUploaderDropzone"]::before {{
+            background-image: url("data:image/png;base64,{icono_base64}") !important;
+            width: 64px !important;
+            height: 64px !important;
+        }}
+        """
+
+    # 2. Imagen de fondo para toda la página (web/assets/images.png) con velo suave para legibilidad
+    ruta_fondo = os.path.join(os.path.dirname(__file__), "assets", "images.png")
+    if os.path.exists(ruta_fondo):
+        with open(ruta_fondo, "rb") as bg_file:
+            fondo_base64 = base64.b64encode(bg_file.read()).decode()
+
+        css_imagenes += f"""
+        .stApp {{
+            background-image: linear-gradient(rgba(250, 250, 249, 0.84), rgba(250, 250, 249, 0.88)),
+                              url("data:image/png;base64,{fondo_base64}") !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
+        }}
+        """
+
+    # Protección de contraste en modo claro editorial
     css_contraste = """
     .stApp [data-testid="stMainBlockContainer"] p,
     .stApp [data-testid="stMainBlockContainer"] span,
-    .stApp [data-testid="stMainBlockContainer"] label,
-    .stApp [data-testid="stMainBlockContainer"] h1,
-    .stApp [data-testid="stMainBlockContainer"] h2,
-    .stApp [data-testid="stMainBlockContainer"] h3,
-    .stApp [data-testid="stMainBlockContainer"] h4,
-    .stApp [data-testid="stMainBlockContainer"] h5,
-    .stTabs [data-baseweb="tab"] p {
-        color: #1E293B !important;
+    .stApp [data-testid="stMainBlockContainer"] label {
+        color: #1C1917;
     }
-    .hero-banner h1, .hero-banner p, .hero-banner span, .hero-banner div,
-    button[kind="primary"] p, button[kind="primary"] span {
+    .stTabs [data-baseweb="tab"][aria-selected="true"] p,
+    button[kind="primary"] p,
+    button[kind="primary"] span,
+    .nav-pill-btn,
+    .sheet-tab-green {
         color: #FFFFFF !important;
     }
+    button[kind="secondary"] p,
+    button[kind="secondary"] span {
+        color: #165B33 !important;
+    }
     """
-    st.markdown(f"<style>{css_contenido}\n{css_contraste}</style>", unsafe_allow_html=True)
+    st.markdown(f"<style>{css_contenido}\n{css_imagenes}\n{css_contraste}</style>", unsafe_allow_html=True)
 
 # Aplicar los estilos visuales desde el archivo externo
 cargar_estilos_css()
@@ -83,17 +118,30 @@ cargar_estilos_css()
 contenedor_sidebar = st.sidebar.empty()
 
 # ==========================================
-# ENCABEZADO PRINCIPAL (HERO BANNER)
+# BARRA DE NAVEGACIÓN SUPERIOR Y ENCABEZADO
 # ==========================================
-st.markdown("""
-    <div class="hero-banner">
-        <div class="hero-badge">Suite Analítica • Machine Learning</div>
-        <h1>Plataforma de Minería de Datos</h1>
-        <p>Entorno interactivo para validación de calidad de datos, preprocesamiento estadístico automatizado y entrenamiento de Árboles de Decisión.</p>
-    </div>
-""", unsafe_allow_html=True)
+st.markdown(
+"""<div class="top-navbar">
+<div class="nav-links">
+<span>Validación CSV</span>
+<span>Limpieza Estadística</span>
+<span>Árboles de Decisión</span>
+<span>Comparativa</span>
+</div>
+<div class="nav-pill-btn">Franco &amp; Erick</div>
+</div>
+<div class="editorial-hero">
+<div class="editorial-kicker">MINERÍA DE DATOS Y APRENDIZAJE AUTOMÁTICO</div>
+<div class="editorial-title">Limpieza y análisis predictivo para CSV</div>
+<div class="editorial-desc">
+Sube un archivo CSV en bruto. Aplicamos validación estructural, imputación de valores nulos, 
+detección de anomalías (IQR) y entrenamiento de Árboles de Decisión en un solo flujo interactivo.
+</div>
+</div>""",
+    unsafe_allow_html=True
+)
 
-# Definición de pestañas estilizadas como botones tipo píldora (Pill Tabs)
+# Definición de pestañas principales
 tab1, tab2, tab3, tab4 = st.tabs([
     "1. Carga y Validación (RF1)",
     "2. Preprocesamiento y Limpieza (RF2)",
@@ -105,46 +153,87 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # PESTAÑA 1: CARGA Y VALIDACIÓN (Ingesta de Datos)
 # ==========================================
 with tab1:
-    st.markdown('<div class="section-title">Importación y diagnóstico del dataset</div>', unsafe_allow_html=True)
-    st.write(
-        "Importa el archivo de origen en formato **.CSV**. El sistema detectará automáticamente "
-        "la codificación de caracteres, el delimitador de columnas y validará la integridad estructural."
-    )
+    col_izq, col_der = st.columns([1.15, 1], gap="large")
 
-    # Componente de carga de archivos con dropzone estilizado
-    archivo = st.file_uploader(
-        "Selecciona o arrastra un archivo CSV dentro del recuadro",
-        type=["csv"],
-        help="Límite de tamaño: 50 MB. Estructura mínima requerida: 2 columnas."
-    )
-
-    # Botón auxiliar para cargar directamente el dataset de prueba si no se ha subido archivo
-    if archivo is None and "df_original" not in st.session_state:
-        if st.button("Cargar dataset de prueba (datos_sucios_prueba.csv)", type="secondary"):
-            ruta_prueba = os.path.join(RUTA_RAIZ, "storage", "datasets", "datos_sucios_prueba.csv")
-            os.makedirs(os.path.dirname(ruta_prueba), exist_ok=True)
-            contenido_demo = (
-                "ID Cliente;Edad Cliente;Ingreso Mensual;Compras Mes;Metodo Pago;Abandono Cliente\n"
-                "1;25;450000;3;Tarjeta;No\n"
-                "2;34;620000;5;Transferencia;No\n"
-                "2;34;620000;5;Transferencia;No\n"
-                "3;150;510000;2;Efectivo;Si\n"
-                "4;;480000;1;Tarjeta;Si\n"
-                "5;29;590000;4;;No\n"
-                "6;42;8500000;6;Transferencia;No\n"
-                "7;31;530000;2;Efectivo;Si\n"
-                "8;27;490000;3;Tarjeta;No\n"
-                "9;38;610000;4;Transferencia;No\n"
-                "10;22;410000;1;Efectivo;Si\n"
-                "11;45;720000;5;Tarjeta;No\n"
-                "12;33;550000;2;Efectivo;Si\n"
+    with col_izq:
+        with st.container(border=True):
+            # Se coloca sin sangría interna para evitar que Markdown lo interprete como bloque de código
+            st.markdown(
+"""<div class="visual-flow-wrapper">
+<div>
+<div class="sheet-mockup">
+<div class="sheet-tab-gray">Archivo Crudo</div>
+<div class="mini-grid">
+<div class="cell-gray"></div><div class="cell-gray"></div><div class="cell-gray"></div><div class="cell-gray"></div>
+<div class="cell-gray"></div><div class="cell-red"></div><div class="cell-gray"></div><div class="cell-amber"></div>
+<div class="cell-amber"></div><div class="cell-gray"></div><div class="cell-red"></div><div class="cell-gray"></div>
+<div class="cell-gray"></div><div class="cell-gray"></div><div class="cell-amber"></div><div class="cell-red"></div>
+</div>
+</div>
+<div class="flow-caption"><strong>Un CSV desordenado</strong><br>con nulos, duplicados y outliers</div>
+</div>
+<div class="flow-arrow">→</div>
+<div>
+<div style="display:flex; gap:8px; align-items:flex-start;">
+<div class="sheet-mockup" style="width:155px;">
+<div class="sheet-tab-green">Datos Limpios</div>
+<div class="mini-grid">
+<div class="cell-green-dark"></div><div class="cell-green-dark"></div><div class="cell-green-dark"></div><div class="cell-green-dark"></div>
+<div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div>
+<div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div>
+<div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div>
+</div>
+</div>
+<div class="issues-card">
+<strong>⚠️ Auditoría</strong>
+• Duplicados<br>
+• Nulos (NaN)<br>
+• Outliers IQR
+</div>
+</div>
+<div class="flow-caption"><strong>Una tabla estructurada</strong><br>+ auditoría completa de reparaciones</div>
+</div>
+</div>""",
+                unsafe_allow_html=True
             )
-            with open(ruta_prueba, "w", encoding="utf-8") as f_demo:
-                f_demo.write(contenido_demo)
-            archivo_memoria = io.BytesIO(contenido_demo.encode("utf-8"))
-            archivo_memoria.name = "datos_sucios_prueba.csv"
-            archivo_memoria.size = len(contenido_demo.encode("utf-8"))
-            archivo = archivo_memoria
+
+    with col_der:
+        with st.container(border=True):
+            # Componente de carga de archivos estilizado vía CSS para replicar el dropzone editorial
+            archivo = st.file_uploader(
+                "Subir archivo CSV",
+                type=["csv"],
+                label_visibility="collapsed"
+            )
+
+            # Botón auxiliar para cargar directamente el dataset de prueba si no se ha subido archivo
+            if archivo is None and "df_original" not in st.session_state:
+                st.write("")
+                if st.button("Cargar dataset de prueba (datos_sucios_prueba.csv)", type="secondary", width="stretch"):
+                    ruta_prueba = os.path.join(RUTA_RAIZ, "storage", "datasets", "datos_sucios_prueba.csv")
+                    os.makedirs(os.path.dirname(ruta_prueba), exist_ok=True)
+                    contenido_demo = (
+                        "ID Cliente;Edad Cliente;Ingreso Mensual;Compras Mes;Metodo Pago;Abandono Cliente\n"
+                        "1;25;450000;3;Tarjeta;No\n"
+                        "2;34;620000;5;Transferencia;No\n"
+                        "2;34;620000;5;Transferencia;No\n"
+                        "3;150;510000;2;Efectivo;Si\n"
+                        "4;;480000;1;Tarjeta;Si\n"
+                        "5;29;590000;4;;No\n"
+                        "6;42;8500000;6;Transferencia;No\n"
+                        "7;31;530000;2;Efectivo;Si\n"
+                        "8;27;490000;3;Tarjeta;No\n"
+                        "9;38;610000;4;Transferencia;No\n"
+                        "10;22;410000;1;Efectivo;Si\n"
+                        "11;45;720000;5;Tarjeta;No\n"
+                        "12;33;550000;2;Efectivo;Si\n"
+                    )
+                    with open(ruta_prueba, "w", encoding="utf-8") as f_demo:
+                        f_demo.write(contenido_demo)
+                    archivo_memoria = io.BytesIO(contenido_demo.encode("utf-8"))
+                    archivo_memoria.name = "datos_sucios_prueba.csv"
+                    archivo_memoria.size = len(contenido_demo.encode("utf-8"))
+                    archivo = archivo_memoria
 
     if archivo is not None:
         # Invocación al módulo validador del backend
@@ -152,11 +241,9 @@ with tab1:
         if not exito:
             st.error(mensaje)
         else:
-            # Control para disparar la notificación flotante (Toast) solo cuando se carga un archivo nuevo
             if st.session_state.get("nombre_dataset") != meta["nombre"]:
                 st.toast(f"Dataset '{meta['nombre']}' validado correctamente.", icon="✔️")
                 
-            # Almacenamiento en el estado de la sesión para persistencia entre pestañas
             st.session_state["df_original"] = df
             st.session_state["meta_dataset"] = meta
             st.session_state["nombre_dataset"] = meta["nombre"]
@@ -166,8 +253,8 @@ with tab1:
         df_mostrar_raw = st.session_state["df_original"]
         meta = st.session_state["meta_dataset"]
 
+        st.write("")
         st.markdown('<div class="section-title">Diagnóstico técnico del archivo</div>', unsafe_allow_html=True)
-        # Visualización de metadatos mediante tarjetas de métricas con relieve
         col1, col2, col3, col4, col5 = st.columns(5)
         col1.metric("Peso en disco", meta["tamano_kb"], help="Tamaño físico del archivo.")
         col2.metric("Codificación", meta["codificacion"], help="Estándar de caracteres detectado.")
@@ -179,8 +266,6 @@ with tab1:
         with st.container(border=True):
             st.caption("Vista previa sin alteraciones. Los valores faltantes se visualizan como 'None' y serán tratados en la siguiente etapa.")
             st.dataframe(df_mostrar_raw, width="stretch")
-    elif archivo is None:
-        st.info("Sube un archivo CSV en el panel superior para habilitar las herramientas de preprocesamiento y modelado.")
 
 # ==========================================
 # PESTAÑA 2: LIMPIEZA AUTOMÁTICA (Preparación de Datos)
@@ -201,7 +286,6 @@ with tab2:
             st.markdown("##### Parámetros del pipeline de limpieza")
             st.caption("Ajusta el comportamiento de los algoritmos de reparación (los cambios se aplican en tiempo real):")
             
-            # Controles interactivos para definir la estrategia de limpieza
             c_opt1, c_opt2 = st.columns(2)
             metodo_nulos = c_opt1.selectbox(
                 "Tratamiento de valores faltantes (Nulos / NaN)",
@@ -223,7 +307,6 @@ with tab2:
         # Ejecución del pipeline de limpieza en el backend
         df_limpio, resumen = limpiar_dataset_automatico(df, metodo_nulos, metodo_outliers)
         
-        # Guardar el dataset procesado en memoria para la etapa de entrenamiento
         st.session_state["df_limpio"] = df_limpio
         st.session_state["resumen_limpieza"] = resumen
 
@@ -287,7 +370,6 @@ with tab3:
         )
 
         columnas_disponibles = df_limpio.columns.tolist()
-        # Por convención, se sugiere la última columna como variable Target por defecto
         indice_objetivo_default = len(columnas_disponibles) - 1
 
         with st.container(border=True):
@@ -301,9 +383,7 @@ with tab3:
                     help="Atributo categórico que el modelo aprenderá a clasificar."
                 )
                 
-                # Filtrar la variable objetivo de las predictoras para evitar fuga de datos (Data Leakage)
                 opciones_predictoras = [c for c in columnas_disponibles if c != col_objetivo]
-                # Excluir automáticamente columnas identificadoras (ID) de la selección por defecto
                 default_predictoras = [c for c in opciones_predictoras if 'id' not in c.split('_')]
                 
                 cols_predictoras = st.multiselect(
@@ -334,7 +414,6 @@ with tab3:
                 test_size = porcentaje_prueba / 100.0
 
             st.write("")
-            # Botón de acción principal con retroalimentación de carga (Spinner)
             if st.button("Ejecutar entrenamiento del modelo", type="primary", width="stretch"):
                 with st.spinner("Ejecutando codificación One-Hot, particionando datos y ajustando el Árbol de Decisión..."):
                     exito_arbol, msj_arbol, res_arbol = entrenar_arbol_decision(
@@ -346,7 +425,6 @@ with tab3:
                     st.session_state["ultimo_arbol"] = res_arbol
                     st.toast("Modelo entrenado y evaluado correctamente.", icon="✔️")
 
-        # Renderizado de resultados y artefactos visuales si existe un modelo en sesión
         if "ultimo_arbol" in st.session_state:
             res = st.session_state["ultimo_arbol"]
             st.markdown('<div class="section-title">Métricas de rendimiento (Validación sobre Test Set)</div>', unsafe_allow_html=True)
@@ -355,7 +433,6 @@ with tab3:
                 f"**{res['filas_prueba']} registros de prueba**."
             )
 
-            # Tarjetas con las métricas estándar de clasificación
             k1, k2, k3, k4 = st.columns(4)
             k1.metric(
                 "Exactitud (Accuracy)",
@@ -395,14 +472,13 @@ with tab3:
                         "Contraste entre las etiquetas reales (eje Y) y las predicciones del modelo (eje X). "
                         "La diagonal principal concentra los aciertos."
                     )
-                    # Mapa de calor interactivo con Plotly en gama cromática Purple-Blue ('PuBu')
                     fig_cm = px.imshow(
                         res["matriz_confusion"],
                         labels=dict(x="Predicción del Modelo", y="Valor Real (Ground Truth)", color="Registros"),
                         x=res["clases"],
                         y=res["clases"],
                         text_auto=True,
-                        color_continuous_scale="PuBu"
+                        color_continuous_scale="Greens"
                     )
                     fig_cm.update_layout(
                         margin=dict(l=20, r=20, t=20, b=20),
@@ -411,7 +487,6 @@ with tab3:
                     )
                     st.plotly_chart(fig_cm, width="stretch")
 
-            # Sección de persistencia del modelo (.pkl y .json)
             with st.container(border=True):
                 st.markdown("##### Persistencia del modelo")
                 st.caption("Almacena el modelo serializado (.pkl) y registra sus hiperparámetros para futuras comparativas:")
@@ -436,7 +511,6 @@ with tab4:
         "mediante gráficos comparativos y gestiona los archivos persistentes."
     )
 
-    # Lectura del archivo JSON de registro desde el backend
     modelos_guardados = listar_modelos_guardados()
 
     if not modelos_guardados:
@@ -446,7 +520,6 @@ with tab4:
         
         with st.container(border=True):
             st.markdown("##### Matriz de experimentos registrados")
-            # Formateo de nombres de columnas para presentación ejecutiva
             df_mostrar = df_modelos[[
                 "id", "nombre", "fecha", "dataset", "variable_objetivo",
                 "criterio", "profundidad_max", "division_prueba",
@@ -468,20 +541,19 @@ with tab4:
 
         with st.container(border=True):
             st.markdown("##### Comparativa visual de rendimiento")
-            # Gráfico interactivo de barras agrupadas con paleta de alto contraste (Índigo, Cian, Esmeralda)
             fig_comp = px.bar(
                 df_modelos,
                 x="nombre",
                 y=["exactitud", "precision", "recall"],
                 barmode="group",
                 labels={"value": "Puntaje (Escala 0.0 - 1.0)", "nombre": "Modelo Evaluado", "variable": "Métrica"},
-                color_discrete_sequence=["#4F46E5", "#0EA5E9", "#10B981"]
+                color_discrete_sequence=["#165B33", "#10B981", "#D97706"]
             )
             fig_comp.update_layout(
                 yaxis_range=[0, 1.05],
                 legend_title_text="Métrica",
                 paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="#F8FAFC"
+                plot_bgcolor="#FAFAF9"
             )
             st.plotly_chart(fig_comp, width="stretch")
 
@@ -503,7 +575,7 @@ with tab4:
 # BARRA LATERAL (ACTUALIZACIÓN EN TIEMPO REAL)
 # ==========================================
 with contenedor_sidebar.container():
-    st.markdown("## Panel de Control")
+    st.markdown("### Panel de Control")
     st.caption("Desarrollado por Franco Fajardo y Erick Mamani")
     st.divider()
 
@@ -512,20 +584,25 @@ with contenedor_sidebar.container():
     tiene_limpio = "df_limpio" in st.session_state
     tiene_arbol = "ultimo_arbol" in st.session_state
 
-    st.markdown(f"""
-        <div class="step-card">
-            <span>1. Ingesta de CSV</span>
-            <span class="{'badge-ok' if tiene_archivo else 'badge-wait'}">{'LISTO' if tiene_archivo else 'PENDIENTE'}</span>
-        </div>
-        <div class="step-card">
-            <span>2. Limpieza de Datos</span>
-            <span class="{'badge-ok' if tiene_limpio else 'badge-wait'}">{'LISTO' if tiene_limpio else 'PENDIENTE'}</span>
-        </div>
-        <div class="step-card">
-            <span>3. Modelo Predictivo</span>
-            <span class="{'badge-ok' if tiene_arbol else 'badge-wait'}">{'LISTO' if tiene_arbol else 'PENDIENTE'}</span>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+"""<div class="step-card">
+<span>1. Ingesta de CSV</span>
+<span class="{0}">{1}</span>
+</div>
+<div class="step-card">
+<span>2. Limpieza de Datos</span>
+<span class="{2}">{3}</span>
+</div>
+<div class="step-card">
+<span>3. Modelo Predictivo</span>
+<span class="{4}">{5}</span>
+</div>""".format(
+            'badge-ok' if tiene_archivo else 'badge-wait', 'LISTO' if tiene_archivo else 'PENDIENTE',
+            'badge-ok' if tiene_limpio else 'badge-wait', 'LISTO' if tiene_limpio else 'PENDIENTE',
+            'badge-ok' if tiene_arbol else 'badge-wait', 'LISTO' if tiene_arbol else 'PENDIENTE'
+        ),
+        unsafe_allow_html=True
+    )
 
     if tiene_archivo:
         st.divider()
