@@ -1,5 +1,5 @@
 /* =========================================================
-   HOJA DE ESTILOS: estilos.css (V4 - Dropzone Editorial Exacto)
+   HOJA DE ESTILOS: estilos.css (V6 - Hero Enmarcado + Stepper)
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
@@ -23,7 +23,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.85rem 1.5rem;
-    background-color: #FFFFFF;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
     border: 1px solid #E7E5E4;
     border-radius: 14px;
     margin-bottom: 2rem;
@@ -45,31 +46,39 @@
     font-weight: 600;
 }
 
-/* --- HERO EDITORIAL CENTRADO --- */
+/* --- HERO EDITORIAL CENTRADO CON MARCO DESTACADO --- */
 .editorial-hero {
     text-align: center;
-    padding: 0.5rem 1rem 2rem 1rem;
-    max-width: 820px;
-    margin: 0 auto;
+    padding: 2.25rem 2.5rem;
+    max-width: 880px;
+    margin: 0 auto 2rem auto;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid #D6D3D1;
+    border-top: 5px solid #165B33;
+    border-radius: 20px;
+    box-shadow: 0 12px 30px -6px rgba(22, 91, 51, 0.12), 0 4px 12px rgba(28, 25, 23, 0.04);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.editorial-hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px -6px rgba(22, 91, 51, 0.16);
 }
 .editorial-kicker {
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #78716C;
-    margin-bottom: 0.75rem;
-    display: flex;
+    color: #165B33;
+    background-color: #F2F9F5;
+    border: 1px solid #BBF7D0;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-}
-.editorial-kicker::before,
-.editorial-kicker::after {
-    content: "";
-    height: 1px;
-    width: 28px;
-    background-color: #D6D3D1;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 .editorial-title {
     font-family: 'Instrument Serif', Georgia, serif !important;
@@ -86,6 +95,69 @@
     line-height: 1.6;
     max-width: 650px;
     margin: 0 auto;
+}
+
+/* =========================================================
+   BARRA DE NAVEGACIÓN INTERACTIVA (STEPPER TIPO PÍLDORA)
+   ========================================================= */
+div[data-testid="stTabs"] [data-baseweb="tab-list"] {
+    background-color: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(8px) !important;
+    padding: 0.55rem !important;
+    border-radius: 16px !important;
+    border: 1px solid #D6D3D1 !important;
+    box-shadow: 0 8px 20px -4px rgba(28, 25, 23, 0.08) !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1.75rem !important;
+    display: flex !important;
+    justify-content: space-between !important;
+}
+
+div[data-testid="stTabs"] button[data-baseweb="tab"] {
+    flex: 1 !important;
+    height: auto !important;
+    padding: 0.8rem 1rem !important;
+    border-radius: 11px !important;
+    background-color: #F5F5F4 !important;
+    border: 1px solid transparent !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+}
+
+div[data-testid="stTabs"] button[data-baseweb="tab"] p {
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    color: #57534E !important;
+    margin: 0 !important;
+    transition: color 0.2s ease !important;
+}
+
+div[data-testid="stTabs"] button[data-baseweb="tab"]:hover {
+    background-color: #E7F5EC !important;
+    border-color: #86EFAC !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(22, 91, 51, 0.12) !important;
+}
+
+div[data-testid="stTabs"] button[data-baseweb="tab"]:hover p {
+    color: #165B33 !important;
+}
+
+div[data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] {
+    background: linear-gradient(135deg, #165B33 0%, #1E7E48 100%) !important;
+    border-color: #165B33 !important;
+    box-shadow: 0 6px 16px rgba(22, 91, 51, 0.32) !important;
+    transform: translateY(-1px) !important;
+}
+
+div[data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] p {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+}
+
+div[data-testid="stTabs"] [data-baseweb="tab-highlight"],
+div[data-testid="stTabs"] [data-baseweb="tab-border"] {
+    display: none !important;
 }
 
 /* --- ILUSTRACIÓN VISUAL ANTES VS DESPUÉS --- */
@@ -179,9 +251,8 @@
 }
 
 /* =========================================================
-   DROPZONE PERSONALIZADO (IDÉNTICO A LA IMAGEN DE REFERENCIA)
+   DROPZONE PERSONALIZADO
    ========================================================= */
-/* Ocultar el label superior por defecto del uploader */
 div[data-testid="stFileUploader"] > label {
     display: none !important;
 }
@@ -209,14 +280,12 @@ section[data-testid="stFileUploaderDropzone"]:hover {
     box-shadow: 0 10px 24px rgba(22, 91, 51, 0.08) !important;
 }
 
-/* Ocultar el botón gris 'Browse files' y textos nativos de Streamlit dentro de la caja */
 section[data-testid="stFileUploaderDropzone"] > div,
 section[data-testid="stFileUploaderDropzone"] button,
 section[data-testid="stFileUploaderDropzone"] svg {
     display: none !important;
 }
 
-/* 1. Ícono superior animado (Trébol / Hoja de datos en SVG incrustado) */
 section[data-testid="stFileUploaderDropzone"]::before {
     content: "";
     display: block;
@@ -230,7 +299,6 @@ section[data-testid="stFileUploaderDropzone"]::before {
     animation: flotarSuave 3s ease-in-out infinite;
 }
 
-/* 2. Título principal en Serif Verde Bosque + Subtítulo con formato y reglas */
 section[data-testid="stFileUploaderDropzone"]::after {
     content: "Arrastra y suelta o haz clic para subir tu archivo.\A\A Formatos permitidos: .csv  ·  Tamaño máximo: 50 MB\A Solo se admiten archivos tabulares con al menos 2 columnas y cabeceras válidas.";
     white-space: pre-wrap;
@@ -243,47 +311,13 @@ section[data-testid="stFileUploaderDropzone"]::after {
     color: #165B33;
 }
 
-/* --- PESTAÑAS DE NAVEGACIÓN --- */
-.stTabs [data-baseweb="tab-list"] {
-    background-color: #FFFFFF !important;
-    padding: 0.4rem !important;
-    border-radius: 12px !important;
-    border: 1px solid #E7E5E4 !important;
-    gap: 0.4rem !important;
-    margin-bottom: 1.5rem !important;
-    justify-content: center;
-}
-.stTabs [data-baseweb="tab"] {
-    padding: 0.6rem 1.35rem !important;
-    border-radius: 8px !important;
-    background-color: transparent !important;
-    border: none !important;
-}
-.stTabs [data-baseweb="tab"] p {
-    font-size: 0.9rem !important;
-    font-weight: 600 !important;
-    color: #57534E !important;
-    margin: 0 !important;
-}
-.stTabs [data-baseweb="tab"][aria-selected="true"] {
-    background-color: #165B33 !important;
-    box-shadow: 0 3px 10px rgba(22, 91, 51, 0.25) !important;
-}
-.stTabs [data-baseweb="tab"][aria-selected="true"] p {
-    color: #FFFFFF !important;
-}
-.stTabs [data-baseweb="tab-highlight"],
-.stTabs [data-baseweb="tab-border"] {
-    display: none !important;
-}
-
 /* --- CONTENEDORES Y TARJETAS --- */
 div[data-testid="stVerticalBlockBorderWrapper"] {
-    background-color: #FFFFFF !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
     border: 1px solid #E7E5E4 !important;
     border-radius: 18px !important;
     padding: 1.35rem !important;
-    box-shadow: 0 4px 20px rgba(28, 25, 23, 0.03) !important;
+    box-shadow: 0 4px 20px rgba(28, 25, 23, 0.04) !important;
 }
 
 /* --- TARJETAS DE MÉTRICAS (KPIs) --- */

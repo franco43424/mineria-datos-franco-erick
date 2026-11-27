@@ -97,7 +97,7 @@ def cargar_estilos_css(nombre_archivo="estilos.css"):
     .stApp [data-testid="stMainBlockContainer"] label {
         color: #1C1917;
     }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] p,
+    div[data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] p,
     button[kind="primary"] p,
     button[kind="primary"] span,
     .nav-pill-btn,
@@ -141,12 +141,12 @@ detección de anomalías (IQR) y entrenamiento de Árboles de Decisión en un so
     unsafe_allow_html=True
 )
 
-# Definición de pestañas principales
+# Definición de pestañas interactivas tipo Stepper
 tab1, tab2, tab3, tab4 = st.tabs([
-    "1. Carga y Validación (RF1)",
-    "2. Preprocesamiento y Limpieza (RF2)",
-    "3. Modelado: Árbol de Decisión (RF3)",
-    "4. Historial y Comparativa"
+    "① Carga y Validación (RF1)",
+    "② Limpieza Automática (RF2)",
+    "③ Árbol de Decisión (RF3)",
+    "④ Historial y Comparativa"
 ])
 
 # ==========================================
@@ -274,7 +274,7 @@ with tab2:
     st.markdown('<div class="section-title">Preprocesamiento y reparación automatizada</div>', unsafe_allow_html=True)
 
     if "df_original" not in st.session_state:
-        st.warning("Debes importar un archivo CSV válido en la pestaña **1. Carga y Validación** antes de continuar.")
+        st.warning("Debes importar un archivo CSV válido en la pestaña **① Carga y Validación** antes de continuar.")
     else:
         df = st.session_state["df_original"]
         st.write(
@@ -514,7 +514,7 @@ with tab4:
     modelos_guardados = listar_modelos_guardados()
 
     if not modelos_guardados:
-        st.info("No existen modelos registrados actualmente. Entrena y guarda un modelo en la **Pestaña 3** para habilitar la comparativa.")
+        st.info("No existen modelos registrados actualmente. Entrena y guarda un modelo en la **Pestaña ③** para habilitar la comparativa.")
     else:
         df_modelos = pd.DataFrame(modelos_guardados)
         
