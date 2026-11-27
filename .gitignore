@@ -221,4 +221,12 @@ __marimo__/
 
 venv/
 __pycache__/
-storage/modelos/*.pkl
+
+# Resultados generados por la aplicación (cada usuario genera los suyos)
+storage/modelos/*
+storage/reglas/*
+!storage/modelos/.gitkeep
+!storage/reglas/.gitkeep
+
+# macOS
+.DS_Store
