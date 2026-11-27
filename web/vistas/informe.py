@@ -18,7 +18,7 @@ def mostrar():
     st.markdown('<div class="section-title">Generación del informe final</div>', unsafe_allow_html=True)
 
     if "df_limpio" not in st.session_state:
-        st.warning("Debes procesar los datos en las pestañas **1** y **2** antes de generar un informe.")
+        st.warning("Debes procesar los datos en las pestañas **① Carga** y **② Limpieza** antes de generar un informe.")
     else:
         st.write(
             "El informe reúne el **resumen de los datos**, la **limpieza** realizada, los **modelos** de árbol de decisión, "

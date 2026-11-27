@@ -7,6 +7,8 @@ y permite guardar el modelo.
 import streamlit as st
 import plotly.express as px
 
+from componentes.estilos import ESCALA_CONTINUA
+
 from analisis.config import es_columna_id
 from analisis.arbol_decision import entrenar_arbol_decision, guardar_modelo
 
@@ -133,14 +135,14 @@ def mostrar():
                         "Contraste entre las etiquetas reales (eje Y) y las predicciones del modelo (eje X). "
                         "La diagonal principal concentra los aciertos."
                     )
-                    # Mapa de calor interactivo con Plotly en gama cromática Purple-Blue ('PuBu')
+                    # Mapa de calor interactivo con Plotly en la escala verde del diseño
                     fig_cm = px.imshow(
                         res["matriz_confusion"],
                         labels=dict(x="Predicción del Modelo", y="Valor Real (Ground Truth)", color="Registros"),
                         x=res["clases"],
                         y=res["clases"],
                         text_auto=True,
-                        color_continuous_scale="PuBu"
+                        color_continuous_scale=ESCALA_CONTINUA
                     )
                     fig_cm.update_layout(
                         margin=dict(l=20, r=20, t=20, b=20),

@@ -7,6 +7,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+from componentes.estilos import PALETA, ESCALA_CONTINUA
+
 from analisis.config import es_columna_id
 from analisis.dashboard import clasificar_columnas
 from analisis.asociacion import (
@@ -24,7 +26,7 @@ def mostrar():
     st.markdown('<div class="section-title">Descubrimiento de patrones: Reglas de Asociación</div>', unsafe_allow_html=True)
 
     if "df_limpio" not in st.session_state:
-        st.warning("Debes procesar los datos en las pestañas **1** y **2** antes de buscar reglas de asociación.")
+        st.warning("Debes procesar los datos en las pestañas **① Carga** y **② Limpieza** antes de buscar reglas de asociación.")
     else:
         df_limpio = st.session_state["df_limpio"]
         st.write(
@@ -139,7 +141,7 @@ def mostrar():
                         fig_reglas = px.scatter(
                             tabla_filtrada, x="soporte", y="confianza", color="lift", size="n_items",
                             hover_data={"antecedente": True, "consecuente": True, "lift": ":.2f"},
-                            color_continuous_scale="PuBu",
+                            color_continuous_scale=ESCALA_CONTINUA,
                             labels={"soporte": "Soporte", "confianza": "Confianza", "lift": "Lift"}
                         )
                         fig_reglas.update_layout(margin=dict(l=20, r=20, t=20, b=20), paper_bgcolor="rgba(0,0,0,0)")
@@ -190,9 +192,9 @@ def mostrar():
                     fig_comp_r = px.bar(
                         df_reglas_g, x="nombre", y=["lift_maximo", "confianza_promedio"], barmode="group",
                         labels={"nombre": "Análisis", "value": "Valor", "variable": "Indicador"},
-                        color_discrete_sequence=["#4F46E5", "#10B981"]
+                        color_discrete_sequence=PALETA
                     )
-                    fig_comp_r.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#F8FAFC")
+                    fig_comp_r.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#FAFAF9")
                     st.plotly_chart(fig_comp_r, width="stretch")
 
             with st.container(border=True):

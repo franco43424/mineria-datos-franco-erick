@@ -7,6 +7,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+from componentes.estilos import PALETA, ESCALA_CONTINUA
+
 from analisis.arbol_decision import listar_modelos_guardados
 from analisis.dashboard import (
     clasificar_columnas,
@@ -24,7 +26,7 @@ def mostrar():
     st.markdown('<div class="section-title">Dashboard interactivo</div>', unsafe_allow_html=True)
 
     if "df_limpio" not in st.session_state:
-        st.warning("Debes procesar los datos en las pestañas **1** y **2** para habilitar el dashboard.")
+        st.warning("Debes procesar los datos en las pestañas **① Carga** y **② Limpieza** para habilitar el dashboard.")
     else:
         df_dash = st.session_state["df_limpio"]
         numericas, categoricas = clasificar_columnas(df_dash)
@@ -92,7 +94,7 @@ def mostrar():
                         var_num = st.selectbox("Variable numérica", numericas, key="dash_var_num")
                         fig_hist = px.histogram(
                             df_filtrado, x=var_num, color=col_color, nbins=20, barmode="overlay", opacity=0.75,
-                            color_discrete_sequence=["#4F46E5", "#0EA5E9", "#10B981", "#F59E0B", "#EF4444"]
+                            color_discrete_sequence=PALETA
                         )
                         fig_hist.update_layout(margin=dict(l=10, r=10, t=30, b=10), paper_bgcolor="rgba(0,0,0,0)",
                                                title=f"Histograma de {var_num}")
@@ -106,7 +108,7 @@ def mostrar():
                         var_cat = st.selectbox("Variable categórica", opciones_cat, key="dash_var_cat")
                         fig_cat = px.histogram(
                             df_filtrado, x=var_cat, color=col_color, barmode="group",
-                            color_discrete_sequence=["#4F46E5", "#0EA5E9", "#10B981", "#F59E0B", "#EF4444"]
+                            color_discrete_sequence=PALETA
                         )
                         fig_cat.update_layout(margin=dict(l=10, r=10, t=30, b=10), paper_bgcolor="rgba(0,0,0,0)",
                                               title=f"Registros por {var_cat}", yaxis_title="Registros")
@@ -118,7 +120,7 @@ def mostrar():
                 with st.container(border=True):
                     var_box = st.selectbox("Comparar distribución por grupo (diagrama de caja)", numericas, key="dash_var_box")
                     fig_box = px.box(df_filtrado, x=col_color, y=var_box, color=col_color, points="outliers",
-                                     color_discrete_sequence=["#4F46E5", "#0EA5E9", "#10B981", "#F59E0B", "#EF4444"])
+                                     color_discrete_sequence=PALETA)
                     fig_box.update_layout(margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", showlegend=False)
                     st.plotly_chart(fig_box, width="stretch")
 
@@ -155,12 +157,12 @@ def mostrar():
                         df_mod_dash = pd.DataFrame(modelos_dash)
                         fig_mod = px.bar(df_mod_dash, x="nombre", y=["exactitud", "precision", "recall"], barmode="group",
                                          labels={"nombre": "Modelo", "value": "Puntaje", "variable": "Métrica"},
-                                         color_discrete_sequence=["#4F46E5", "#0EA5E9", "#10B981"])
-                        fig_mod.update_layout(yaxis_range=[0, 1.05], paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#F8FAFC",
+                                         color_discrete_sequence=PALETA)
+                        fig_mod.update_layout(yaxis_range=[0, 1.05], paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#FAFAF9",
                                               margin=dict(l=10, r=10, t=10, b=10))
                         st.plotly_chart(fig_mod, width="stretch")
                     else:
-                        st.info("No hay modelos guardados (pestaña 3).")
+                        st.info("No hay modelos guardados (pestaña ③).")
             with m_col2:
                 with st.container(border=True):
                     st.markdown("##### Top 10 reglas de asociación (por lift)")
@@ -169,11 +171,11 @@ def mostrar():
                         top_reglas["regla"] = top_reglas["antecedente"] + " → " + top_reglas["consecuente"]
                         fig_top = px.bar(top_reglas.iloc[::-1], x="lift", y="regla", orientation="h",
                                          hover_data=["soporte", "confianza"], color="confianza",
-                                         color_continuous_scale="PuBu", labels={"regla": "", "lift": "Lift"})
+                                         color_continuous_scale=ESCALA_CONTINUA, labels={"regla": "", "lift": "Lift"})
                         fig_top.update_layout(paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=10, r=10, t=10, b=10))
                         st.plotly_chart(fig_top, width="stretch")
                     else:
-                        st.info("Genera reglas en la pestaña 5 para verlas aquí.")
+                        st.info("Genera reglas en la pestaña ⑤ para verlas aquí.")
 
             with st.expander(f"Ver datos filtrados ({len(df_filtrado)} registros)"):
                 st.dataframe(df_filtrado, width="stretch")

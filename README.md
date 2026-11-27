@@ -8,7 +8,7 @@
   Encargado de la arquitectura base, programación de los motores de minería de datos en Python (`analisis/`) y estructuración funcional de la plataforma web en Streamlit (`web/vistas/`) según los requerimientos del sistema.
 
 * **Erick Mamani — Diseño de Interfaz (UI/UX), Validación y Mejora Continua:**  
-  Encargado del diseño visual personalizado (`web/static/estilos.css`), refinamiento de la experiencia de usuario en la interfaz gráfica, validación de pruebas (QA), optimización visual de métricas y documentación técnica del código fuente.
+  Encargado del diseño visual editorial (`web/static/estilos.css`, `web/static/assets/`: barra superior, hero enmarcado, pestañas tipo stepper, ilustración animada de la carga y paleta verde), refinamiento de la experiencia de usuario en la interfaz gráfica, validación de pruebas (QA), optimización visual de métricas y documentación técnica del código fuente.
 
 ---
 
@@ -59,7 +59,8 @@ mineria-datos-franco-erick/
 │   │   ├── estilos.py           #   Carga del CSS y encabezado
 │   │   └── barra_lateral.py     #   Panel de estado del flujo
 │   └── static/
-│       └── estilos.css          # Diseño visual personalizado
+│       ├── estilos.css          # Diseño editorial (paleta verde, hero, stepper de pestañas)
+│       └── assets/              # Imagen de fondo e ícono animado del recuadro de carga
 │
 ├── datos/                       # ENTRADAS: CSV de ejemplo
 │   ├── ejemplos/                # 5 datasets "sucios" a propósito (ver datos/LEEME.md)

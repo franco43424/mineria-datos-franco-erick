@@ -10,7 +10,7 @@ import streamlit as st
 def mostrar_barra_lateral(contenedor):
     """Dibuja el estado del pipeline dentro del contenedor reservado en la barra lateral."""
     with contenedor.container():
-        st.markdown("## Panel de Control")
+        st.markdown("### Panel de Control")
         st.caption("Desarrollado por Franco Fajardo y Erick Mamani")
         st.divider()
 

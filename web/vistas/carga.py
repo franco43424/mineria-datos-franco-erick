@@ -12,40 +12,84 @@ import streamlit as st
 from analisis.config import RUTA_EJEMPLOS
 from analisis.validador import validar_y_cargar_csv
 
+# Ilustración animada "CSV desordenado → tabla limpia + auditoría" (diseño de Erick Mamani)
+ILUSTRACION_FLUJO = """<div class="visual-flow-wrapper">
+<div>
+<div class="sheet-mockup">
+<div class="sheet-tab-gray">Archivo Crudo</div>
+<div class="mini-grid">
+<div class="cell-gray"></div><div class="cell-gray"></div><div class="cell-gray"></div><div class="cell-gray"></div>
+<div class="cell-gray"></div><div class="cell-red"></div><div class="cell-gray"></div><div class="cell-amber"></div>
+<div class="cell-amber"></div><div class="cell-gray"></div><div class="cell-red"></div><div class="cell-gray"></div>
+<div class="cell-gray"></div><div class="cell-gray"></div><div class="cell-amber"></div><div class="cell-red"></div>
+</div>
+</div>
+<div class="flow-caption"><strong>Un CSV desordenado</strong><br>con nulos, duplicados y outliers</div>
+</div>
+<div class="flow-arrow">→</div>
+<div>
+<div style="display:flex; gap:8px; align-items:flex-start;">
+<div class="sheet-mockup" style="width:155px;">
+<div class="sheet-tab-green">Datos Limpios</div>
+<div class="mini-grid">
+<div class="cell-green-dark"></div><div class="cell-green-dark"></div><div class="cell-green-dark"></div><div class="cell-green-dark"></div>
+<div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div>
+<div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div>
+<div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div><div class="cell-green-soft"></div>
+</div>
+</div>
+<div class="issues-card">
+<strong>⚠️ Auditoría</strong>
+• Duplicados<br>
+• Nulos (NaN)<br>
+• Outliers IQR
+</div>
+</div>
+<div class="flow-caption"><strong>Una tabla estructurada</strong><br>+ auditoría completa de reparaciones</div>
+</div>
+</div>"""
+
 
 def mostrar():
     """Dibuja el contenido de la pestaña."""
-    st.markdown('<div class="section-title">Importación y diagnóstico del dataset</div>', unsafe_allow_html=True)
-    st.write(
-        "Importa el archivo de origen en formato **.CSV**. El sistema detectará automáticamente "
-        "la codificación de caracteres, el delimitador de columnas y validará la integridad estructural."
-    )
+    # Diseño en dos columnas (Erick): ilustración "antes / después" a la izquierda y carga a la derecha
+    col_izq, col_der = st.columns([1.15, 1], gap="large")
 
-    # Componente de carga de archivos con dropzone estilizado
-    archivo = st.file_uploader(
-        "Selecciona o arrastra un archivo CSV dentro del recuadro",
-        type=["csv"],
-        help="Límite de tamaño: 50 MB. Estructura mínima requerida: 2 columnas."
-    )
+    with col_izq:
+        with st.container(border=True):
+            # El HTML va sin sangría para que Markdown no lo interprete como bloque de código
+            st.markdown(ILUSTRACION_FLUJO, unsafe_allow_html=True)
 
-    # Selector de datasets de ejemplo incluidos en datos/ejemplos (se leen tal cual, sin modificarlos)
-    ruta_datasets = RUTA_EJEMPLOS
-    datasets_demo = sorted(f for f in os.listdir(ruta_datasets) if f.lower().endswith(".csv")) if os.path.isdir(ruta_datasets) else []
-    if archivo is None and datasets_demo:
-        c_demo1, c_demo2 = st.columns([3, 1])
-        demo_elegido = c_demo1.selectbox(
-            "...o utiliza uno de los datasets de ejemplo incluidos en el proyecto:",
-            options=datasets_demo,
-            index=datasets_demo.index("01_clientes_tienda.csv") if "01_clientes_tienda.csv" in datasets_demo else 0
-        )
-        c_demo2.write("")
-        if c_demo2.button("Cargar ejemplo", type="secondary", width="stretch"):
-            with open(os.path.join(ruta_datasets, demo_elegido), "rb") as f_demo:
-                contenido_demo = f_demo.read()
-            archivo_memoria = io.BytesIO(contenido_demo)
-            archivo_memoria.name = demo_elegido
-            archivo_memoria.size = len(contenido_demo)
-            archivo = archivo_memoria
+    with col_der:
+        with st.container(border=True):
+            # El recuadro se estiliza por CSS (texto, ícono y bordes en web/static/estilos.css)
+            archivo = st.file_uploader(
+                "Subir archivo CSV",
+                type=["csv"],
+                label_visibility="collapsed",
+                help="Límite de tamaño: 50 MB. Estructura mínima requerida: 2 columnas."
+            )
+
+            # Selector de datasets de ejemplo incluidos en datos/ejemplos (se leen tal cual, sin modificarlos)
+            datasets_demo = sorted(
+                f for f in os.listdir(RUTA_EJEMPLOS) if f.lower().endswith(".csv")
+            ) if os.path.isdir(RUTA_EJEMPLOS) else []
+            if archivo is None and datasets_demo:
+                st.markdown('<div class="ejemplos-caption">...o usa uno de los datasets de ejemplo del proyecto</div>',
+                            unsafe_allow_html=True)
+                demo_elegido = st.selectbox(
+                    "Dataset de ejemplo",
+                    options=datasets_demo,
+                    index=datasets_demo.index("01_clientes_tienda.csv") if "01_clientes_tienda.csv" in datasets_demo else 0,
+                    label_visibility="collapsed"
+                )
+                if st.button("Cargar ejemplo", type="secondary", width="stretch"):
+                    with open(os.path.join(RUTA_EJEMPLOS, demo_elegido), "rb") as f_demo:
+                        contenido_demo = f_demo.read()
+                    archivo_memoria = io.BytesIO(contenido_demo)
+                    archivo_memoria.name = demo_elegido
+                    archivo_memoria.size = len(contenido_demo)
+                    archivo = archivo_memoria
 
     if archivo is not None:
         # Invocación al módulo validador del backend
@@ -70,6 +114,7 @@ def mostrar():
         df_mostrar_raw = st.session_state["df_original"]
         meta = st.session_state["meta_dataset"]
 
+        st.write("")
         st.markdown('<div class="section-title">Diagnóstico técnico del archivo</div>', unsafe_allow_html=True)
         # Visualización de metadatos mediante tarjetas de métricas con relieve
         col1, col2, col3, col4, col5 = st.columns(5)
@@ -83,5 +128,3 @@ def mostrar():
         with st.container(border=True):
             st.caption("Vista previa sin alteraciones. Los valores faltantes se visualizan como 'None' y serán tratados en la siguiente etapa.")
             st.dataframe(df_mostrar_raw, width="stretch")
-    elif archivo is None:
-        st.info("Sube un archivo CSV en el panel superior para habilitar las herramientas de preprocesamiento y modelado.")

@@ -13,7 +13,7 @@ def mostrar():
     st.markdown('<div class="section-title">Preprocesamiento y reparación automatizada</div>', unsafe_allow_html=True)
 
     if "df_original" not in st.session_state:
-        st.warning("Debes importar un archivo CSV válido en la pestaña **1. Carga y Validación** antes de continuar.")
+        st.warning("Debes importar un archivo CSV válido en la pestaña **① Carga** antes de continuar.")
     else:
         df = st.session_state["df_original"]
         st.write(

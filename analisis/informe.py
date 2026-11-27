@@ -22,9 +22,9 @@ import matplotlib.pyplot as plt
 
 from analisis.dashboard import matriz_correlacion, correlaciones_destacadas, interpretar_correlacion
 
-# Paleta coherente con la interfaz (estilos.css)
-COLOR_PRINCIPAL = "#4F46E5"
-COLORES = ["#4F46E5", "#0EA5E9", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"]
+# Paleta verde coherente con el diseño de la interfaz (web/static/estilos.css)
+COLOR_PRINCIPAL = "#165B33"
+COLORES = ["#165B33", "#10B981", "#D97706", "#0EA5E9", "#DC2626", "#7C3AED"]
 
 
 # =====================================================================
@@ -336,13 +336,13 @@ def generar_informe_html(nombre_dataset, meta, df_original, df_limpio, resumen_l
 <style>
     body {{ font-family: "Segoe UI", Roboto, Arial, sans-serif; color: #1E293B; background: #F1F5F9; margin: 0; }}
     .hoja {{ max-width: 980px; margin: 0 auto; background: #FFFFFF; padding: 40px 48px; }}
-    header {{ background: linear-gradient(135deg, #4F46E5, #0EA5E9); color: #FFFFFF; padding: 28px 32px; border-radius: 12px; }}
+    header {{ background: linear-gradient(135deg, #165B33, #1E7E48); color: #FFFFFF; padding: 28px 32px; border-radius: 12px; }}
     header h1 {{ margin: 0 0 6px; font-size: 26px; }}
     header p {{ margin: 0; opacity: .9; }}
-    h2 {{ color: #4F46E5; border-bottom: 2px solid #E2E8F0; padding-bottom: 6px; margin-top: 36px; }}
+    h2 {{ color: #165B33; border-bottom: 2px solid #E2E8F0; padding-bottom: 6px; margin-top: 36px; }}
     h3 {{ font-size: 15px; margin: 22px 0 8px; color: #334155; }}
     .tabla {{ border-collapse: collapse; width: 100%; font-size: 12.5px; margin: 8px 0 14px; }}
-    .tabla th {{ background: #EEF2FF; text-align: left; padding: 7px 9px; }}
+    .tabla th {{ background: #F2F9F5; text-align: left; padding: 7px 9px; }}
     .tabla td {{ padding: 6px 9px; border-bottom: 1px solid #E2E8F0; }}
     .kpis {{ display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0; }}
     .kpi {{ flex: 1; min-width: 130px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 12px; font-size: 12px; color: #64748B; }}

@@ -28,7 +28,7 @@ from vistas import carga, limpieza, arbol, historial, asociacion, dashboard, inf
 st.set_page_config(
     page_title="Plataforma de Minería de Datos",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 cargar_estilos_css()
@@ -39,15 +39,16 @@ contenedor_sidebar = st.sidebar.empty()
 
 mostrar_encabezado()
 
-# Pestañas en el orden del flujo de trabajo de Orange: Datos → Preprocesamiento → Modelos → Visualización → Informe
+# Pestañas tipo stepper (diseño de Erick), en el orden del flujo de Orange:
+# Datos → Preprocesamiento → Modelos → Visualización → Informe
 PESTANAS = [
-    ("1. Carga y Validación (RF1)", carga),
-    ("2. Preprocesamiento y Limpieza (RF2)", limpieza),
-    ("3. Árbol de Decisión (RF3)", arbol),
-    ("4. Historial y Comparativa (RF3)", historial),
-    ("5. Reglas de Asociación (RF4)", asociacion),
-    ("6. Dashboard (RF6)", dashboard),
-    ("7. Informe (RF5)", informe),
+    ("① Carga", carga),
+    ("② Limpieza", limpieza),
+    ("③ Árbol de Decisión", arbol),
+    ("④ Historial", historial),
+    ("⑤ Asociación", asociacion),
+    ("⑥ Dashboard", dashboard),
+    ("⑦ Informe", informe),
 ]
 
 for pestana, (_, vista) in zip(st.tabs([nombre for nombre, _ in PESTANAS]), PESTANAS):

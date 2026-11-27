@@ -7,6 +7,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+from componentes.estilos import PALETA
+
 from analisis.arbol_decision import listar_modelos_guardados, eliminar_modelo_guardado
 
 
@@ -22,7 +24,7 @@ def mostrar():
     modelos_guardados = listar_modelos_guardados()
 
     if not modelos_guardados:
-        st.info("No existen modelos registrados actualmente. Entrena y guarda un modelo en la **Pestaña 3** para habilitar la comparativa.")
+        st.info("No existen modelos registrados actualmente. Entrena y guarda un modelo en la pestaña **③ Árbol de Decisión** para habilitar la comparativa.")
     else:
         df_modelos = pd.DataFrame(modelos_guardados)
         
@@ -57,13 +59,13 @@ def mostrar():
                 y=["exactitud", "precision", "recall"],
                 barmode="group",
                 labels={"value": "Puntaje (Escala 0.0 - 1.0)", "nombre": "Modelo Evaluado", "variable": "Métrica"},
-                color_discrete_sequence=["#4F46E5", "#0EA5E9", "#10B981"]
+                color_discrete_sequence=PALETA
             )
             fig_comp.update_layout(
                 yaxis_range=[0, 1.05],
                 legend_title_text="Métrica",
                 paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="#F8FAFC"
+                plot_bgcolor="#FAFAF9"
             )
             st.plotly_chart(fig_comp, width="stretch")
 
