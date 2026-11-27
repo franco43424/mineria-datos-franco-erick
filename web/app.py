@@ -17,6 +17,7 @@ if RUTA_RAIZ not in sys.path:
     sys.path.append(RUTA_RAIZ)
 
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import plotly.express as px
 
@@ -25,9 +26,15 @@ import plotly.express as px
 import analisis.validador
 import analisis.limpieza
 import analisis.arbol_decision
+import analisis.asociacion
+import analisis.dashboard
+import analisis.informe
 importlib.reload(analisis.validador)
 importlib.reload(analisis.limpieza)
 importlib.reload(analisis.arbol_decision)
+importlib.reload(analisis.asociacion)
+importlib.reload(analisis.dashboard)
+importlib.reload(analisis.informe)
 
 from analisis.validador import validar_y_cargar_csv
 from analisis.limpieza import limpiar_dataset_automatico
@@ -37,6 +44,24 @@ from analisis.arbol_decision import (
     listar_modelos_guardados,
     eliminar_modelo_guardado
 )
+from analisis.asociacion import (
+    generar_reglas_asociacion,
+    filtrar_reglas,
+    guardar_reglas,
+    listar_reglas_guardadas,
+    cargar_tabla_reglas,
+    eliminar_reglas_guardadas
+)
+from analisis.dashboard import (
+    clasificar_columnas,
+    aplicar_filtros,
+    calcular_kpis,
+    matriz_correlacion,
+    correlaciones_destacadas,
+    interpretar_correlacion,
+    estadisticas_descriptivas
+)
+from analisis.informe import generar_informe_html
 
 # Configuración principal de la página web (Diseño ancho y barra lateral expandida)
 st.set_page_config(
@@ -94,11 +119,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Definición de pestañas estilizadas como botones tipo píldora (Pill Tabs)
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "1. Carga y Validación (RF1)",
     "2. Preprocesamiento y Limpieza (RF2)",
     "3. Modelado: Árbol de Decisión (RF3)",
-    "4. Historial y Comparativa"
+    "4. Historial y Comparativa (RF3)",
+    "5. Reglas de Asociación (RF4)",
+    "6. Dashboard (RF6)",
+    "7. Informe (RF5)"
 ])
 
 # ==========================================
@@ -118,32 +146,23 @@ with tab1:
         help="Límite de tamaño: 50 MB. Estructura mínima requerida: 2 columnas."
     )
 
-    # Botón auxiliar para cargar directamente el dataset de prueba si no se ha subido archivo
-    if archivo is None and "df_original" not in st.session_state:
-        if st.button("Cargar dataset de prueba (datos_sucios_prueba.csv)", type="secondary"):
-            ruta_prueba = os.path.join(RUTA_RAIZ, "storage", "datasets", "datos_sucios_prueba.csv")
-            os.makedirs(os.path.dirname(ruta_prueba), exist_ok=True)
-            contenido_demo = (
-                "ID Cliente;Edad Cliente;Ingreso Mensual;Compras Mes;Metodo Pago;Abandono Cliente\n"
-                "1;25;450000;3;Tarjeta;No\n"
-                "2;34;620000;5;Transferencia;No\n"
-                "2;34;620000;5;Transferencia;No\n"
-                "3;150;510000;2;Efectivo;Si\n"
-                "4;;480000;1;Tarjeta;Si\n"
-                "5;29;590000;4;;No\n"
-                "6;42;8500000;6;Transferencia;No\n"
-                "7;31;530000;2;Efectivo;Si\n"
-                "8;27;490000;3;Tarjeta;No\n"
-                "9;38;610000;4;Transferencia;No\n"
-                "10;22;410000;1;Efectivo;Si\n"
-                "11;45;720000;5;Tarjeta;No\n"
-                "12;33;550000;2;Efectivo;Si\n"
-            )
-            with open(ruta_prueba, "w", encoding="utf-8") as f_demo:
-                f_demo.write(contenido_demo)
-            archivo_memoria = io.BytesIO(contenido_demo.encode("utf-8"))
-            archivo_memoria.name = "datos_sucios_prueba.csv"
-            archivo_memoria.size = len(contenido_demo.encode("utf-8"))
+    # Selector de datasets de ejemplo incluidos en storage/datasets (se leen tal cual, sin modificarlos)
+    ruta_datasets = os.path.join(RUTA_RAIZ, "storage", "datasets")
+    datasets_demo = sorted(f for f in os.listdir(ruta_datasets) if f.lower().endswith(".csv")) if os.path.isdir(ruta_datasets) else []
+    if archivo is None and datasets_demo:
+        c_demo1, c_demo2 = st.columns([3, 1])
+        demo_elegido = c_demo1.selectbox(
+            "...o utiliza uno de los datasets de ejemplo incluidos en el proyecto:",
+            options=datasets_demo,
+            index=datasets_demo.index("clientes_abandono.csv") if "clientes_abandono.csv" in datasets_demo else 0
+        )
+        c_demo2.write("")
+        if c_demo2.button("Cargar ejemplo", type="secondary", width="stretch"):
+            with open(os.path.join(ruta_datasets, demo_elegido), "rb") as f_demo:
+                contenido_demo = f_demo.read()
+            archivo_memoria = io.BytesIO(contenido_demo)
+            archivo_memoria.name = demo_elegido
+            archivo_memoria.size = len(contenido_demo)
             archivo = archivo_memoria
 
     if archivo is not None:
@@ -155,6 +174,9 @@ with tab1:
             # Control para disparar la notificación flotante (Toast) solo cuando se carga un archivo nuevo
             if st.session_state.get("nombre_dataset") != meta["nombre"]:
                 st.toast(f"Dataset '{meta['nombre']}' validado correctamente.", icon="✔️")
+                # Al cambiar de dataset se descartan los resultados calculados con el anterior
+                for clave in ["ultimo_arbol", "resultado_reglas", "informe_html"]:
+                    st.session_state.pop(clave, None)
                 
             # Almacenamiento en el estado de la sesión para persistencia entre pestañas
             st.session_state["df_original"] = df
@@ -500,6 +522,428 @@ with tab4:
                 st.rerun()
 
 # ==========================================
+# PESTAÑA 5: REGLAS DE ASOCIACIÓN (RF4)
+# ==========================================
+with tab5:
+    st.markdown('<div class="section-title">Descubrimiento de patrones: Reglas de Asociación</div>', unsafe_allow_html=True)
+
+    if "df_limpio" not in st.session_state:
+        st.warning("Debes procesar los datos en las pestañas **1** y **2** antes de buscar reglas de asociación.")
+    else:
+        df_limpio = st.session_state["df_limpio"]
+        st.write(
+            "Busca combinaciones de valores que aparecen juntas con frecuencia, del tipo "
+            "**SI** (antecedente) **ENTONCES** (consecuente). Cada fila se transforma en una transacción de ítems "
+            "`columna=valor`; las variables numéricas se agrupan en intervalos (Bajo / Medio / Alto)."
+        )
+
+        columnas_asoc = [c for c in df_limpio.columns if 'id' not in c.split('_')]
+        _, categoricas_asoc = clasificar_columnas(df_limpio)
+        default_asoc = [c for c in categoricas_asoc if c in columnas_asoc][:6] or columnas_asoc[:4]
+
+        with st.container(border=True):
+            col_a1, col_a2 = st.columns(2)
+            with col_a1:
+                st.markdown("##### 1. Datos de entrada")
+                cols_asoc = st.multiselect(
+                    "Columnas a analizar",
+                    options=columnas_asoc,
+                    default=default_asoc,
+                    help="Variables cuyos valores se combinarán para buscar patrones. Más columnas = más reglas y más tiempo de cálculo."
+                )
+                n_intervalos = st.slider(
+                    "Intervalos para variables numéricas",
+                    min_value=2, max_value=5, value=3,
+                    help="Las columnas numéricas se dividen en grupos de igual tamaño (cuantiles) antes de aplicar el algoritmo."
+                )
+                algoritmo = st.selectbox(
+                    "Algoritmo",
+                    options=["apriori", "fpgrowth"],
+                    format_func=lambda x: "Apriori (clásico, por niveles)" if x == "apriori" else "FP-Growth (árbol de patrones, más rápido)",
+                    help="Ambos encuentran los mismos conjuntos frecuentes; FP-Growth es más eficiente en datasets grandes."
+                )
+            with col_a2:
+                st.markdown("##### 2. Umbrales")
+                min_soporte = st.slider(
+                    "Soporte mínimo",
+                    min_value=0.01, max_value=0.50, value=0.10, step=0.01,
+                    help="Proporción mínima de registros en que debe aparecer la combinación completa de la regla."
+                )
+                min_confianza = st.slider(
+                    "Confianza mínima",
+                    min_value=0.10, max_value=1.00, value=0.60, step=0.05,
+                    help="Probabilidad mínima de que ocurra el consecuente cuando ocurre el antecedente."
+                )
+                max_longitud = st.slider(
+                    "Máximo de ítems por regla",
+                    min_value=2, max_value=5, value=3,
+                    help="Limita el largo de las reglas para que sean fáciles de interpretar."
+                )
+
+            st.write("")
+            if st.button("Generar reglas de asociación", type="primary", width="stretch"):
+                with st.spinner("Construyendo transacciones y buscando conjuntos frecuentes..."):
+                    exito_asoc, msj_asoc, res_asoc = generar_reglas_asociacion(
+                        df_limpio, cols_asoc, min_soporte, min_confianza, algoritmo, n_intervalos, max_longitud
+                    )
+                if not exito_asoc:
+                    st.session_state.pop("resultado_reglas", None)
+                    st.error(msj_asoc)
+                else:
+                    st.session_state["resultado_reglas"] = res_asoc
+                    st.toast(msj_asoc, icon="✔️")
+
+        if "resultado_reglas" in st.session_state:
+            res_asoc = st.session_state["resultado_reglas"]
+            tabla_reglas = res_asoc["tabla_reglas"]
+
+            st.markdown('<div class="section-title">Resultados</div>', unsafe_allow_html=True)
+            r1, r2, r3, r4 = st.columns(4)
+            r1.metric("Reglas generadas", len(tabla_reglas))
+            r2.metric("Conjuntos frecuentes", res_asoc["n_frecuentes"])
+            r3.metric("Ítems distintos", res_asoc["n_items"], help="Cantidad de pares columna=valor posibles.")
+            r4.metric("Transacciones", res_asoc["n_transacciones"])
+
+            with st.container(border=True):
+                st.markdown("##### Filtrado y ordenamiento")
+                f1, f2, f3, f4 = st.columns([2, 1, 1, 1])
+                texto_busqueda = f1.text_input(
+                    "Buscar ítem (antecedente o consecuente)",
+                    placeholder="Ej: abandono_cliente=Si"
+                )
+                lift_min_filtro = f2.number_input("Lift mínimo", min_value=0.0, value=1.0, step=0.1)
+                conf_min_filtro = f3.number_input("Confianza mínima", min_value=0.0, max_value=1.0,
+                                                  value=float(res_asoc["min_confianza"]), step=0.05)
+                orden_reglas = f4.selectbox("Ordenar por", ["lift", "confianza", "soporte", "n_items"])
+                ascendente = st.toggle("Orden ascendente", value=False)
+
+                tabla_filtrada = filtrar_reglas(tabla_reglas, texto_busqueda, lift_min_filtro,
+                                                conf_min_filtro, orden_reglas, ascendente)
+                st.caption(f"Mostrando **{len(tabla_filtrada)}** de {len(tabla_reglas)} reglas. "
+                           "Lift > 1 indica que antecedente y consecuente aparecen juntos más de lo esperable por azar.")
+                st.dataframe(
+                    tabla_filtrada.rename(columns={
+                        "antecedente": "SI (Antecedente)", "consecuente": "ENTONCES (Consecuente)",
+                        "soporte": "Soporte", "confianza": "Confianza", "lift": "Lift", "n_items": "Ítems"
+                    }),
+                    width="stretch", hide_index=True
+                )
+
+            col_g1, col_g2 = st.columns([3, 2])
+            with col_g1:
+                with st.container(border=True):
+                    st.markdown("##### Mapa de reglas: soporte vs. confianza")
+                    if not tabla_filtrada.empty:
+                        fig_reglas = px.scatter(
+                            tabla_filtrada, x="soporte", y="confianza", color="lift", size="n_items",
+                            hover_data={"antecedente": True, "consecuente": True, "lift": ":.2f"},
+                            color_continuous_scale="PuBu",
+                            labels={"soporte": "Soporte", "confianza": "Confianza", "lift": "Lift"}
+                        )
+                        fig_reglas.update_layout(margin=dict(l=20, r=20, t=20, b=20), paper_bgcolor="rgba(0,0,0,0)")
+                        st.plotly_chart(fig_reglas, width="stretch")
+                    else:
+                        st.info("Ninguna regla cumple los filtros actuales.")
+            with col_g2:
+                with st.container(border=True):
+                    st.markdown("##### Guardar resultado")
+                    st.caption("Se guardan las reglas **tal como están filtradas** (CSV + registro JSON en storage/reglas).")
+                    nombre_reglas = st.text_input(
+                        "Nombre del análisis",
+                        placeholder="Ej: Perfil de abandono - soporte 10%"
+                    )
+                    if st.button("Guardar reglas", type="primary", width="stretch"):
+                        if tabla_filtrada.empty:
+                            st.error("No hay reglas para guardar con los filtros actuales.")
+                        else:
+                            reg_r = guardar_reglas(nombre_reglas, res_asoc,
+                                                   st.session_state.get("nombre_dataset", "dataset.csv"), tabla_filtrada)
+                            st.toast(f"Análisis '{reg_r['nombre']}' guardado.", icon="💾")
+                            st.rerun()
+                    st.download_button(
+                        "Descargar reglas (.csv)",
+                        data=tabla_filtrada.to_csv(index=False).encode("utf-8"),
+                        file_name="reglas_asociacion.csv",
+                        mime="text/csv"
+                    )
+
+        # Gestión de resultados guardados
+        st.markdown('<div class="section-title">Resultados de asociación guardados</div>', unsafe_allow_html=True)
+        reglas_guardadas = listar_reglas_guardadas()
+        if not reglas_guardadas:
+            st.info("Aún no hay análisis de asociación guardados.")
+        else:
+            df_reglas_g = pd.DataFrame(reglas_guardadas)
+            with st.container(border=True):
+                st.dataframe(
+                    df_reglas_g[["nombre", "fecha", "dataset", "algoritmo", "min_soporte", "min_confianza",
+                                 "cantidad_reglas", "lift_maximo", "confianza_promedio", "mejor_regla"]].rename(columns={
+                        "nombre": "Análisis", "fecha": "Fecha", "dataset": "Dataset", "algoritmo": "Algoritmo",
+                        "min_soporte": "Soporte mín.", "min_confianza": "Confianza mín.", "cantidad_reglas": "N° reglas",
+                        "lift_maximo": "Lift máx.", "confianza_promedio": "Confianza prom.", "mejor_regla": "Regla con mayor lift"
+                    }),
+                    width="stretch", hide_index=True
+                )
+                if len(df_reglas_g) > 1:
+                    fig_comp_r = px.bar(
+                        df_reglas_g, x="nombre", y=["lift_maximo", "confianza_promedio"], barmode="group",
+                        labels={"nombre": "Análisis", "value": "Valor", "variable": "Indicador"},
+                        color_discrete_sequence=["#4F46E5", "#10B981"]
+                    )
+                    fig_comp_r.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#F8FAFC")
+                    st.plotly_chart(fig_comp_r, width="stretch")
+
+            with st.container(border=True):
+                g1, g2, g3 = st.columns([3, 1, 1])
+                id_reglas_sel = g1.selectbox(
+                    "Selecciona un análisis guardado:",
+                    options=[r["id"] for r in reglas_guardadas],
+                    format_func=lambda x: next((f"{r['nombre']} — {r['fecha']} ({r['cantidad_reglas']} reglas)"
+                                                for r in reglas_guardadas if r["id"] == x), x),
+                    label_visibility="collapsed"
+                )
+                ver_reglas = g2.button("Ver reglas", width="stretch")
+                if g3.button("Eliminar", type="secondary", width="stretch"):
+                    eliminar_reglas_guardadas(id_reglas_sel)
+                    st.toast("Análisis de asociación eliminado.", icon="🗑️")
+                    st.rerun()
+                if ver_reglas:
+                    st.dataframe(cargar_tabla_reglas(id_reglas_sel), width="stretch", hide_index=True)
+
+# ==========================================
+# PESTAÑA 6: DASHBOARD INTERACTIVO (RF6)
+# ==========================================
+with tab6:
+    st.markdown('<div class="section-title">Dashboard interactivo</div>', unsafe_allow_html=True)
+
+    if "df_limpio" not in st.session_state:
+        st.warning("Debes procesar los datos en las pestañas **1** y **2** para habilitar el dashboard.")
+    else:
+        df_dash = st.session_state["df_limpio"]
+        numericas, categoricas = clasificar_columnas(df_dash)
+
+        # Variable objetivo sugerida: la usada en el último árbol, o la última columna categórica
+        objetivo_sugerido = st.session_state.get("ultimo_arbol", {}).get("col_objetivo")
+        if objetivo_sugerido not in categoricas:
+            objetivo_sugerido = categoricas[-1] if categoricas else None
+
+        with st.container(border=True):
+            st.markdown("##### Filtros dinámicos")
+            fc1, fc2 = st.columns([1, 2])
+            opciones_color = ["(ninguna)"] + categoricas
+            col_color = fc1.selectbox(
+                "Variable para segmentar (color)",
+                options=opciones_color,
+                index=opciones_color.index(objetivo_sugerido) if objetivo_sugerido in opciones_color else 0,
+                help="Los gráficos se colorean según esta variable (por ejemplo, la variable objetivo)."
+            )
+            col_color = None if col_color == "(ninguna)" else col_color
+            cols_filtro = fc2.multiselect(
+                "Columnas por las que filtrar",
+                options=list(dict.fromkeys(categoricas + numericas)),
+                default=[c for c in categoricas if c != col_color][:2],
+                help="Elige columnas y ajusta sus valores: todos los gráficos e indicadores se recalculan al instante."
+            )
+
+            filtros = {}
+            if cols_filtro:
+                columnas_widgets = st.columns(min(len(cols_filtro), 3))
+                for k, col_f in enumerate(cols_filtro):
+                    with columnas_widgets[k % len(columnas_widgets)]:
+                        if col_f in numericas and df_dash[col_f].nunique() > 10:
+                            vmin, vmax = float(df_dash[col_f].min()), float(df_dash[col_f].max())
+                            if vmin < vmax:
+                                rango = st.slider(col_f, min_value=vmin, max_value=vmax, value=(vmin, vmax), key=f"dash_{st.session_state.get('nombre_dataset', '')}_{col_f}")
+                                filtros[col_f] = ("rango", rango)
+                        else:
+                            valores = sorted(df_dash[col_f].dropna().unique().tolist(), key=str)
+                            elegidos = st.multiselect(col_f, options=valores, default=valores, key=f"dash_{st.session_state.get('nombre_dataset', '')}_{col_f}")
+                            filtros[col_f] = ("valores", elegidos)
+
+        df_filtrado = aplicar_filtros(df_dash, filtros)
+        kpis = calcular_kpis(df_filtrado, df_dash, col_color)
+
+        d1, d2, d3, d4 = st.columns(4)
+        d1.metric("Registros filtrados", kpis["registros"], help="Filas que cumplen todos los filtros.")
+        d2.metric("% del dataset", f"{kpis['porcentaje_del_total']}%")
+        d3.metric("Variables", kpis["variables"])
+        if "clase_mayoritaria" in kpis:
+            d4.metric(f"Clase mayoritaria ({col_color})", kpis["clase_mayoritaria"], f"{kpis['porcentaje_clase']}% de los filtrados",
+                      delta_color="off")
+        else:
+            d4.metric("Clase mayoritaria", "—")
+
+        if df_filtrado.empty:
+            st.warning("Ningún registro cumple los filtros seleccionados. Amplía los rangos o categorías.")
+        else:
+            # --- Distribuciones ---
+            st.markdown('<div class="section-title">Distribuciones</div>', unsafe_allow_html=True)
+            g1, g2 = st.columns(2)
+            with g1:
+                with st.container(border=True):
+                    if numericas:
+                        var_num = st.selectbox("Variable numérica", numericas, key="dash_var_num")
+                        fig_hist = px.histogram(
+                            df_filtrado, x=var_num, color=col_color, nbins=20, barmode="overlay", opacity=0.75,
+                            color_discrete_sequence=["#4F46E5", "#0EA5E9", "#10B981", "#F59E0B", "#EF4444"]
+                        )
+                        fig_hist.update_layout(margin=dict(l=10, r=10, t=30, b=10), paper_bgcolor="rgba(0,0,0,0)",
+                                               title=f"Histograma de {var_num}")
+                        st.plotly_chart(fig_hist, width="stretch")
+                    else:
+                        st.info("El dataset no tiene variables numéricas.")
+            with g2:
+                with st.container(border=True):
+                    opciones_cat = [c for c in categoricas if c != col_color] or categoricas
+                    if opciones_cat:
+                        var_cat = st.selectbox("Variable categórica", opciones_cat, key="dash_var_cat")
+                        fig_cat = px.histogram(
+                            df_filtrado, x=var_cat, color=col_color, barmode="group",
+                            color_discrete_sequence=["#4F46E5", "#0EA5E9", "#10B981", "#F59E0B", "#EF4444"]
+                        )
+                        fig_cat.update_layout(margin=dict(l=10, r=10, t=30, b=10), paper_bgcolor="rgba(0,0,0,0)",
+                                              title=f"Registros por {var_cat}", yaxis_title="Registros")
+                        st.plotly_chart(fig_cat, width="stretch")
+                    else:
+                        st.info("El dataset no tiene variables categóricas.")
+
+            if numericas and col_color:
+                with st.container(border=True):
+                    var_box = st.selectbox("Comparar distribución por grupo (diagrama de caja)", numericas, key="dash_var_box")
+                    fig_box = px.box(df_filtrado, x=col_color, y=var_box, color=col_color, points="outliers",
+                                     color_discrete_sequence=["#4F46E5", "#0EA5E9", "#10B981", "#F59E0B", "#EF4444"])
+                    fig_box.update_layout(margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", showlegend=False)
+                    st.plotly_chart(fig_box, width="stretch")
+
+            # --- Correlaciones ---
+            st.markdown('<div class="section-title">Correlaciones</div>', unsafe_allow_html=True)
+            c_corr1, c_corr2 = st.columns([3, 2])
+            with c_corr1:
+                with st.container(border=True):
+                    metodo_corr = st.radio("Método", ["pearson", "spearman"], horizontal=True,
+                                           format_func=lambda x: "Pearson (lineal)" if x == "pearson" else "Spearman (por rangos)")
+                    matriz = matriz_correlacion(df_filtrado, metodo_corr)
+                    if matriz.empty:
+                        st.info("Se necesitan al menos 2 variables numéricas con variación para calcular correlaciones.")
+                    else:
+                        fig_corr = px.imshow(matriz, text_auto=".2f", color_continuous_scale="RdBu_r", zmin=-1, zmax=1, aspect="auto")
+                        fig_corr.update_layout(margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="rgba(0,0,0,0)")
+                        st.plotly_chart(fig_corr, width="stretch")
+            with c_corr2:
+                with st.container(border=True):
+                    st.markdown("##### Relaciones más fuertes")
+                    for a, b, r in correlaciones_destacadas(matriz, top=5):
+                        st.markdown(f"- `{a}` ↔ `{b}`: **{r:.2f}** ({interpretar_correlacion(r)})")
+                    st.markdown("##### Estadísticas descriptivas")
+                    st.dataframe(estadisticas_descriptivas(df_filtrado), width="stretch")
+
+            # --- Resultados de modelos ---
+            st.markdown('<div class="section-title">Resultados de los modelos</div>', unsafe_allow_html=True)
+            m_col1, m_col2 = st.columns(2)
+            with m_col1:
+                with st.container(border=True):
+                    st.markdown("##### Árboles de decisión guardados")
+                    modelos_dash = listar_modelos_guardados()
+                    if modelos_dash:
+                        df_mod_dash = pd.DataFrame(modelos_dash)
+                        fig_mod = px.bar(df_mod_dash, x="nombre", y=["exactitud", "precision", "recall"], barmode="group",
+                                         labels={"nombre": "Modelo", "value": "Puntaje", "variable": "Métrica"},
+                                         color_discrete_sequence=["#4F46E5", "#0EA5E9", "#10B981"])
+                        fig_mod.update_layout(yaxis_range=[0, 1.05], paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#F8FAFC",
+                                              margin=dict(l=10, r=10, t=10, b=10))
+                        st.plotly_chart(fig_mod, width="stretch")
+                    else:
+                        st.info("No hay modelos guardados (pestaña 3).")
+            with m_col2:
+                with st.container(border=True):
+                    st.markdown("##### Top 10 reglas de asociación (por lift)")
+                    if "resultado_reglas" in st.session_state:
+                        top_reglas = st.session_state["resultado_reglas"]["tabla_reglas"].head(10).copy()
+                        top_reglas["regla"] = top_reglas["antecedente"] + " → " + top_reglas["consecuente"]
+                        fig_top = px.bar(top_reglas.iloc[::-1], x="lift", y="regla", orientation="h",
+                                         hover_data=["soporte", "confianza"], color="confianza",
+                                         color_continuous_scale="PuBu", labels={"regla": "", "lift": "Lift"})
+                        fig_top.update_layout(paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=10, r=10, t=10, b=10))
+                        st.plotly_chart(fig_top, width="stretch")
+                    else:
+                        st.info("Genera reglas en la pestaña 5 para verlas aquí.")
+
+            with st.expander(f"Ver datos filtrados ({len(df_filtrado)} registros)"):
+                st.dataframe(df_filtrado, width="stretch")
+                st.download_button("Descargar datos filtrados (.csv)", data=df_filtrado.to_csv(index=False).encode("utf-8"),
+                                   file_name="datos_filtrados.csv", mime="text/csv")
+
+# ==========================================
+# PESTAÑA 7: INFORME (RF5)
+# ==========================================
+with tab7:
+    st.markdown('<div class="section-title">Generación del informe final</div>', unsafe_allow_html=True)
+
+    if "df_limpio" not in st.session_state:
+        st.warning("Debes procesar los datos en las pestañas **1** y **2** antes de generar un informe.")
+    else:
+        st.write(
+            "El informe reúne el **resumen de los datos**, la **limpieza** realizada, los **modelos** de árbol de decisión, "
+            "las **reglas de asociación** y las **conclusiones**. Se exporta como un archivo HTML autocontenido."
+        )
+        df_inf = st.session_state["df_limpio"]
+        _, categoricas_inf = clasificar_columnas(df_inf)
+        objetivo_inf = st.session_state.get("ultimo_arbol", {}).get("col_objetivo")
+
+        with st.container(border=True):
+            i1, i2 = st.columns(2)
+            titulo_informe = i1.text_input("Título del informe", value="Informe de Minería de Datos")
+            opciones_obj_inf = ["(ninguna)"] + categoricas_inf
+            col_obj_inf = i2.selectbox(
+                "Variable objetivo a destacar",
+                options=opciones_obj_inf,
+                index=opciones_obj_inf.index(objetivo_inf) if objetivo_inf in opciones_obj_inf else len(opciones_obj_inf) - 1
+            )
+            conclusiones_usuario = st.text_area(
+                "Conclusiones del equipo (opcional)",
+                placeholder="Escribe aquí la interpretación del equipo. El informe también incluye conclusiones automáticas.",
+                height=120
+            )
+            st.caption(
+                f"Contenido disponible: último árbol {'✔' if 'ultimo_arbol' in st.session_state else '✘'} · "
+                f"modelos guardados: {len(listar_modelos_guardados())} · "
+                f"reglas de asociación {'✔' if 'resultado_reglas' in st.session_state else '✘'}"
+            )
+
+            if st.button("Generar informe", type="primary", width="stretch"):
+                res_reglas_inf = st.session_state.get("resultado_reglas")
+                with st.spinner("Generando gráficos y redactando el informe..."):
+                    st.session_state["informe_html"] = generar_informe_html(
+                        nombre_dataset=st.session_state.get("nombre_dataset", "dataset.csv"),
+                        meta=st.session_state.get("meta_dataset", {}),
+                        df_original=st.session_state["df_original"],
+                        df_limpio=df_inf,
+                        resumen_limpieza=st.session_state["resumen_limpieza"],
+                        modelos=listar_modelos_guardados(),
+                        ultimo_arbol=st.session_state.get("ultimo_arbol"),
+                        resultado_reglas=res_reglas_inf,
+                        tabla_reglas=res_reglas_inf["tabla_reglas"] if res_reglas_inf else None,
+                        col_objetivo=None if col_obj_inf == "(ninguna)" else col_obj_inf,
+                        conclusiones_usuario=conclusiones_usuario,
+                        titulo=titulo_informe
+                    )
+                st.toast("Informe generado.", icon="📄")
+
+        if "informe_html" in st.session_state:
+            nombre_base = os.path.splitext(st.session_state.get("nombre_dataset", "dataset"))[0]
+            st.download_button(
+                "Descargar informe (.html)",
+                data=st.session_state["informe_html"].encode("utf-8"),
+                file_name=f"informe_{nombre_base}.html",
+                mime="text/html",
+                type="primary"
+            )
+            st.caption("Para obtener un **PDF**: abre el archivo descargado en el navegador y usa *Imprimir → Guardar como PDF*.")
+            with st.container(border=True):
+                st.markdown("##### Vista previa")
+                components.html(st.session_state["informe_html"], height=900, scrolling=True)
+
+# ==========================================
 # BARRA LATERAL (ACTUALIZACIÓN EN TIEMPO REAL)
 # ==========================================
 with contenedor_sidebar.container():
@@ -511,6 +955,8 @@ with contenedor_sidebar.container():
     tiene_archivo = "df_original" in st.session_state
     tiene_limpio = "df_limpio" in st.session_state
     tiene_arbol = "ultimo_arbol" in st.session_state
+    tiene_reglas = "resultado_reglas" in st.session_state
+    tiene_informe = "informe_html" in st.session_state
 
     st.markdown(f"""
         <div class="step-card">
@@ -524,6 +970,14 @@ with contenedor_sidebar.container():
         <div class="step-card">
             <span>3. Modelo Predictivo</span>
             <span class="{'badge-ok' if tiene_arbol else 'badge-wait'}">{'LISTO' if tiene_arbol else 'PENDIENTE'}</span>
+        </div>
+        <div class="step-card">
+            <span>4. Reglas de Asociación</span>
+            <span class="{'badge-ok' if tiene_reglas else 'badge-wait'}">{'LISTO' if tiene_reglas else 'PENDIENTE'}</span>
+        </div>
+        <div class="step-card">
+            <span>5. Informe HTML</span>
+            <span class="{'badge-ok' if tiene_informe else 'badge-wait'}">{'LISTO' if tiene_informe else 'PENDIENTE'}</span>
         </div>
     """, unsafe_allow_html=True)
 
@@ -541,5 +995,8 @@ with contenedor_sidebar.container():
             "1. **Carga y Validación:** Importa el dataset en bruto.\n"
             "2. **Preprocesamiento:** Imputación de nulos y control de valores atípicos.\n"
             "3. **Modelado:** Configuración y entrenamiento del Árbol de Decisión.\n"
-            "4. **Evaluación:** Registro histórico y comparativa de métricas."
+            "4. **Evaluación:** Registro histórico y comparativa de métricas.\n"
+            "5. **Asociación:** Reglas SI→ENTONCES con soporte, confianza y lift.\n"
+            "6. **Dashboard:** Gráficos interactivos con filtros dinámicos.\n"
+            "7. **Informe:** Exportación del resumen completo a HTML."
         )

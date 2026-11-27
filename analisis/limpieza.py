@@ -82,7 +82,8 @@ def limpiar_dataset_automatico(df_original, metodo_nulos="imputar", metodo_outli
     # 3. Corrección de tipos de datos (Data Type Casting)
     # Los algoritmos matemáticos fallan si un número está almacenado como texto (ej. "1500")
     for col in df.columns:
-        if df[col].dtype == 'object':
+        # Se revisan columnas de texto: 'object' (pandas 2) o 'str' (pandas 3 usa un tipo string propio)
+        if pd.api.types.is_object_dtype(df[col]) or pd.api.types.is_string_dtype(df[col]):
             # Limpiar espacios en blanco invisibles al inicio o final de las cadenas de texto
             df[col] = df[col].apply(lambda x: x.strip() if isinstance(x, str) else x)
             # Normalizar distintas representaciones de valores vacíos hacia el estándar NaN de NumPy

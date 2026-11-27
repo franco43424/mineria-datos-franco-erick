@@ -39,14 +39,14 @@
 - [x] **Visualización del árbol:** Renderizado gráfico de nodos, reglas de decisión y clases.
 - [x] **Cálculo de las 4 métricas exigidas:** Visualización de Exactitud (*Accuracy*), Precisión, Sensibilidad (*Recall*) y Matriz de Confusión interactiva en Plotly.
 
-![Evidencia RF3 Árbol](docs/capturas/rf3_arbol.png)
+![Evidencia RF3 Árbol](docs/capturas/f3_arbol.PNG)
 
 ### RF3: Gestión y Comparación de Modelos (`web/app.py` y `storage/modelos/`)
 - [x] **Guardar modelos:** Serialización del binario en `.pkl` y registro de metadatos en `registro_modelos.json`.
 - [x] **Listar y comparar:** Tabla histórica y gráfico de barras agrupadas comparando `Arbol Gini Prof 3` vs `Arbol Entropia`.
 - [x] **Eliminar modelos:** Borrado sincronizado del registro en la tabla y del archivo `.pkl` en disco.
 
-![Evidencia RF3 Comparativa](docs/capturas/rf3_comparativa.png)
+![Evidencia RF3 Comparativa](docs/capturas/rf3_comparativa.PNG)
 
 ---
 
@@ -55,3 +55,37 @@
 - [x] **Separación por capas:** Capa de lógica en `/analisis` desacoplada de la interfaz en `/web`.
 - [x] **Dependencias y documentación:** Archivos `requirements.txt`, `.gitignore` y `README.md` operativos.
 - [x] **Historial de Git:** Commits verificados de ambos integrantes en sus respectivas ramas e integrados en `develop` y `main`.
+---
+
+# Reporte de Validación y Pruebas (QA) — Entrega Final
+
+**Fecha de verificación:** _(completar)_  
+**Dataset utilizado en pruebas:** `storage/datasets/clientes_abandono.csv`
+
+> Marcar cada punto con `[x]` después de probarlo en la aplicación y agregar la captura correspondiente en `docs/capturas/`.
+
+## 4. Módulo de Asociación — Vista y Gestión (25% de la Nota 2)
+
+### RF4: Reglas de Asociación (`analisis/asociacion.py`)
+- [ ] **Configuración de soporte y confianza mínimos:** sliders en la Pestaña 5.
+- [ ] **Generación de reglas:** algoritmos Apriori y FP-Growth (mlxtend); variables numéricas discretizadas en intervalos.
+- [ ] **Vista de reglas:** tabla con antecedente, consecuente, soporte, confianza y lift + mapa soporte vs. confianza.
+- [ ] **Filtrado y ordenamiento:** búsqueda por ítem, lift y confianza mínimos, orden por cualquier métrica.
+- [ ] **Gestión de resultados:** guardar (CSV + `registro_reglas.json`), listar, comparar, ver y eliminar.
+
+## 5. Informes y Dashboard (25% de la Nota 2)
+
+### RF5: Informe (`analisis/informe.py`)
+- [ ] **Contenido:** resumen de datos, limpieza, árbol de decisión, modelos guardados, reglas y conclusiones.
+- [ ] **Exportación HTML:** descarga de un archivo autocontenido (gráficos incrustados).
+- [ ] **PDF (opcional):** desde el navegador con Imprimir → Guardar como PDF.
+
+### RF6: Dashboard (`analisis/dashboard.py`)
+- [ ] **Distribuciones:** histograma, barras por categoría y diagrama de caja segmentados por la variable elegida.
+- [ ] **Correlaciones:** matriz Pearson/Spearman y lista de relaciones más fuertes.
+- [ ] **Resultados de modelos:** comparativa de árboles guardados y top 10 reglas por lift.
+- [ ] **Filtros dinámicos:** por categorías y rangos numéricos, con indicadores recalculados.
+
+## 6. Funcionamiento integrado
+- [ ] Flujo completo Carga → Limpieza → Árbol → Asociación → Dashboard → Informe sin errores.
+- [ ] Al cambiar de dataset se reinician los resultados del dataset anterior.
