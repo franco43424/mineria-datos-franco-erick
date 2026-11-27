@@ -23,17 +23,21 @@ from datetime import datetime
 from itertools import combinations
 
 import pandas as pd
-import numpy as np
 
-# Ruta de almacenamiento de los resultados de asociación guardados
-RUTA_REGLAS = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'storage', 'reglas'))
+from analisis.config import RUTA_REGLAS
+
+# Registro (.json) con los metadatos de los análisis de asociación guardados
 ARCHIVO_REGISTRO_REGLAS = os.path.join(RUTA_REGLAS, 'registro_reglas.json')
 
 
 # =====================================================================
 # 1. PREPARACIÓN: De tabla a transacciones (matriz booleana One-Hot)
 # =====================================================================
-def preparar_transacciones(df, columnas, n_intervalos=3):
+# Valores que significan "ausencia" (el producto NO se compró, la condición NO se cumple)
+VALORES_AUSENCIA = {"no", "0", "false", "n", "falso"}
+
+
+def preparar_transacciones(df, columnas, n_intervalos=3, solo_presentes=False):
     """
     Convierte las columnas elegidas en una matriz booleana (True/False) apta para Apriori.
 
@@ -46,6 +50,8 @@ def preparar_transacciones(df, columnas, n_intervalos=3):
         df (DataFrame): Dataset ya limpio.
         columnas (list): Columnas a incluir en el análisis.
         n_intervalos (int): Cantidad de intervalos para discretizar columnas numéricas (2 a 5).
+        solo_presentes (bool): Si es True, descarta los ítems de "ausencia" (ej. 'pan=No').
+            Útil en datos tipo canasta de compras, donde interesa qué productos SÍ se compran juntos.
 
     Retorna:
         DataFrame booleano: filas = transacciones, columnas = ítems.
@@ -76,6 +82,11 @@ def preparar_transacciones(df, columnas, n_intervalos=3):
 
     # One-Hot: cada 'columna=valor' pasa a ser una columna booleana
     matriz = pd.get_dummies(datos, prefix_sep='=').astype(bool)
+
+    if solo_presentes:
+        columnas_presentes = [c for c in matriz.columns
+                              if c.split('=', 1)[1].strip().lower() not in VALORES_AUSENCIA]
+        matriz = matriz[columnas_presentes]
     return matriz
 
 
@@ -146,7 +157,7 @@ def _reglas_propias(frecuentes, min_confianza):
 
 
 def generar_reglas_asociacion(df, columnas, min_soporte=0.1, min_confianza=0.5,
-                              algoritmo="apriori", n_intervalos=3, max_longitud=4):
+                              algoritmo="apriori", n_intervalos=3, max_longitud=4, solo_presentes=False):
     """
     RF4: Genera reglas de asociación a partir de las columnas seleccionadas.
 
@@ -158,6 +169,7 @@ def generar_reglas_asociacion(df, columnas, min_soporte=0.1, min_confianza=0.5,
         algoritmo (str): 'apriori' o 'fpgrowth'.
         n_intervalos (int): Intervalos para discretizar variables numéricas.
         max_longitud (int): Tamaño máximo de los conjuntos de ítems (controla el tiempo de cálculo).
+        solo_presentes (bool): Ignorar ítems de ausencia como 'producto=No' (ver preparar_transacciones).
 
     Retorna:
         tuple: (éxito (bool), mensaje (str), resultado (dict o None))
@@ -165,7 +177,9 @@ def generar_reglas_asociacion(df, columnas, min_soporte=0.1, min_confianza=0.5,
     if len(columnas) < 2:
         return False, "Selecciona al menos 2 columnas para buscar asociaciones entre ellas.", None
 
-    matriz = preparar_transacciones(df, columnas, n_intervalos)
+    matriz = preparar_transacciones(df, columnas, n_intervalos, solo_presentes)
+    if matriz.shape[1] == 0:
+        return False, "No quedaron ítems para analizar con las columnas elegidas.", None
 
     # Se intenta usar mlxtend (librería sugerida en el enunciado); si no está, se usa la versión propia
     motor = "mlxtend"
@@ -212,6 +226,7 @@ def generar_reglas_asociacion(df, columnas, min_soporte=0.1, min_confianza=0.5,
         "min_soporte": min_soporte,
         "min_confianza": min_confianza,
         "n_intervalos": n_intervalos,
+        "solo_presentes": solo_presentes,
         "n_transacciones": len(matriz),
         "n_items": matriz.shape[1],
         "n_frecuentes": len(frecuentes),

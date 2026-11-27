@@ -1,0 +1,255 @@
+ID Alumno ,Carrera,Asistencia (%),Horas Estudio Semana ,Trabaja,Promedio Tareas,Nota Prueba 1 ,Situación Final
+A001,Psicología,80,11.3,No,5.1,4.8,Aprobado
+A002,Contador Auditor,96,11.9,Si,5.5,4.8,Aprobado
+A003,Ingeniería Comercial,95,10.2,No,6.7,5.5,Aprobado
+A004,Psicología,180,10.5,No,4.6,5.0,Aprobado
+A005,Psicología,76,1.3,No,4.2,3.9,Aprobado
+A006,Contador Auditor,74,9.5,No,4.1,4.1,Aprobado
+A007,Ingeniería Civil,87,8.3,No,4.8,3.5,Aprobado
+A008,  Psicología,79,15.2,Si,5.6,5.1,Aprobado
+A009,Psicología,89,8.9,No,5.4,5.8,Aprobado
+A010,Ingeniería Comercial,58,2.9,No,3.6,4.6,Aprobado
+A011,Ingeniería Civil,99,8.2,No,5.6,4.9,Aprobado
+A012,Contador Auditor,79,9.4,No,4.9,4.4,Aprobado
+A013,Contador Auditor,88,1.5,No,3.3,5.1,Aprobado
+A014,Ingeniería Civil,78,7.8,Si,2.7,5.0,Aprobado
+A015,Psicología,75,7.4,No,5.9,4.3,Aprobado
+A016,Contador Auditor,86,95,Si,5.5,4.8,Aprobado
+A017,Ingeniería Civil,90,12.7,No,5.4,4.5,Aprobado
+A018,Ingeniería Comercial,78,7.9,,3.6,4.7,Aprobado
+A019,Psicología,78,3.2,Si,3.5,2.7,Reprobado
+A020,Ingeniería Civil,88,15.1,No,6.4,5.2,Aprobado
+A021,Contador Auditor,70,5.6,No,2.6,3.6,Reprobado
+A022,Contador Auditor,62,4.9,Si,3.8,2.6,Reprobado
+A023,Psicología,85,4.3,,5.1,2.0,Reprobado
+A024,Contador Auditor,72,2.1,Si,4.1,2.4,Reprobado
+A025,Contador Auditor,57,4.8,No,4.2,3.4,Reprobado
+A026,Contador Auditor,70,5.8,Si,4.2,3.3,Reprobado
+A027,Contador Auditor,74,7.3,Si,5.9,3.3,Aprobado
+A028,Ingeniería Civil,66,8.4,No,3.7,4.2,Aprobado
+A029,Contador Auditor,,2.7,No,3.0,3.7,Reprobado
+A030,Contador Auditor,80,5.5,Si,4.7,4.3,Aprobado
+A031,Ingeniería Civil,91,1.7,No,5.4,3.4,Aprobado
+A032,Contador Auditor,77,8.7,Si,4.7,3.9,Aprobado
+A032,Contador Auditor,77,8.7,Si,4.7,3.9,Aprobado
+A033,Contador Auditor,71,15.8,No,5.7,4.5,Aprobado
+A034,Contador Auditor,85,7.4,Si,4.5,3.3,Reprobado
+A035,Psicología,89,4.0,No,4.0,3.0,Reprobado
+A036,Ingeniería Civil,76,6.5,No,5.3,3.9,Aprobado
+A037,Ingeniería Civil,87,10.7,Si,6.1,3.7,Aprobado
+A038,Ingeniería Comercial,93,4.0,No,5.7,6.1,Aprobado
+A039,Contador Auditor,78,0.5,No,3.8,3.4,Reprobado
+A040,Contador Auditor,70,3.7,No,3.4,sin nota,Reprobado
+A041,Contador Auditor,84,6.0,No,4.0,NP,Reprobado
+A042,Ingeniería Comercial,83,11.2,Si,5.0,5.8,Aprobado
+A043,Contador Auditor,93,7.5,Si,5.4,3.5,Aprobado
+A044,Psicología,65,8.2,Si,4.6,3.3,Reprobado
+A045,Ingeniería Comercial,72,9.1,Si,3.7,3.1,Reprobado
+A046,Ingeniería Civil,70,13.3,No,5.0,4.4,Aprobado
+A047,Ingeniería Civil,59,6.4,No,4.0,3.4,Reprobado
+A048,Ingeniería Civil,82,4.6,Si,4.6,4.5,Aprobado
+A049,Ingeniería Comercial,86,,Si,5.0,3.1,Reprobado
+A050,Ingeniería Civil  ,71,11.9,No,4.7,4.3,Aprobado
+A051,Psicología,97,8.3,Si,5.6,5.8,Aprobado
+A052,Ingeniería Comercial,90,5.8,No,4.9,4.0,Aprobado
+A053,Ingeniería Comercial,88,15.6,No,5.7,5.2,Aprobado
+A054,Psicología,85,14.3,,5.0,4.4,Aprobado
+A055,Psicología,91,1.1,Si,4.8,1.5,Reprobado
+A056,Psicología,64,6.8,No,4.1,,Reprobado
+A057,Ingeniería Comercial,87,6.2,No,3.5,5.3,Aprobado
+A058,Psicología,87,2.2,Si,4.8,3.2,Reprobado
+A059,Contador Auditor,59,5.0,No,3.7,1.8,Reprobado
+A060,Contador Auditor,84,8.7,No,5.5,4.7,Aprobado
+A061,Psicología,77,8.0,No,4.6,4.2,Aprobado
+A062,Psicología,89,10.3,No,5.1,5.6,Aprobado
+A063,Psicología,,,Si,4.5,4.1,Aprobado
+A064,Ingeniería Civil,80,16.6,No,5.4,4.9,Aprobado
+A065,Contador Auditor,84,11.6,Si,4.9,4.7,Aprobado
+A066,Ingeniería Civil,69,4.6,No,3.1,2.1,Reprobado
+A067,Ingeniería Civil,87,7.2,No,6.0,5.3,Aprobado
+A068,Ingeniería Comercial,79,9.5,No,3.9,4.6,Aprobado
+A069,Ingeniería Civil,86,4.5,No,4.4,5.0,Aprobado
+A070,Ingeniería Civil,74,15.6,No,5.6,5.7,Aprobado
+A070,Ingeniería Civil,74,15.6,No,5.6,5.7,Aprobado
+A071,Ingeniería Comercial,93,8.6,No,5.4,4.6,Aprobado
+A072,Psicología,87,8.6,Si,5.3,4.1,Aprobado
+A073,Ingeniería Civil,78,8.3,Si,5.2,,Reprobado
+A074,Contador Auditor,88,8.2,No,5.8,2.9,Aprobado
+A075,Ingeniería Comercial,95,8.3,No,5.4,4.7,Aprobado
+A076,Contador Auditor,100,9.1,No,7.0,5.2,Aprobado
+A077,Contador Auditor,61,3.9,No,3.2,2.3,Reprobado
+A078,Contador Auditor,91,5.8,Si,5.0,4.6,Aprobado
+A079,Contador Auditor,86,6.5,No,4.6,4.4,Aprobado
+A080,Contador Auditor,79,14.6,No,4.9,5.3,Aprobado
+A081,Psicología,68,13.3,Si,5.0,3.4,Aprobado
+A082,Contador Auditor,95,6.2,No,5.9,3.2,Aprobado
+A083,Ingeniería Comercial,65,5.6,No,3.7,4.1,Reprobado
+A084,Ingeniería Civil,87,7.1,Si,4.5,4.5,Aprobado
+A085,Ingeniería Civil,96,6.5,Si,5.5,4.2,Aprobado
+A086,Contador Auditor,61,7.4,No,4.4,3.2,Reprobado
+A087,Contador Auditor,76,120,Si,5.4,3.0,Reprobado
+A088,Ingeniería Comercial,64,6.4,No,4.7,3.5,Reprobado
+A089,Psicología,83,10.2,No,5.1,4.2,Aprobado
+A090,Ingeniería Civil,98,4.2,No,4.8,2.9,Reprobado
+A091,Contador Auditor,100,6.0,Si,5.3,5.0,Aprobado
+A092,Contador Auditor,59,13.5,No,4.4,2.9,Reprobado
+A093,Ingeniería Civil,73,4.0,No,3.4,3.4,Reprobado
+A094,Ingeniería Comercial,88,2.2,No,4.5,3.7,Aprobado
+A095,Ingeniería Civil,99,11.3,No,5.5,5.5,Aprobado
+A096,Ingeniería Civil,85,5.0,No,4.5,2.9,Reprobado
+A097,Ingeniería Comercial,71,11.9,No,4.5,5.3,Aprobado
+A098,Psicología,84,5.0,No,5.6,,Aprobado
+A099,Contador Auditor,80,8.7,No,5.2,5.0,Aprobado
+A100,Ingeniería Comercial,78,5.5,Si,5.0,4.6,Aprobado
+A101,Ingeniería Civil,71,16.2,No,4.8,4.2,Aprobado
+A102,Ingeniería Comercial,85,5.9,No,4.1,1.7,Reprobado
+A103,Contador Auditor,,1.5,No,4.2,4.0,Aprobado
+A104,Psicología,79,3.2,Si,4.5,4.4,Aprobado
+A105,Contador Auditor,77,10.1,No,4.6,5.3,Aprobado
+A106,Ingeniería Comercial,65,5.9,Si,4.0,2.7,Reprobado
+A107,Contador Auditor,74,10.0,No,5.3,4.2,Aprobado
+A108,Ingeniería Civil,94,4.1,No,5.0,4.6,Aprobado
+A109,Contador Auditor,78,10.1,Si,4.3,2.6,Reprobado
+A110,Psicología,63,11.3,Si,4.2,3.1,Reprobado
+A111,Contador Auditor,96,7.6,No,4.8,4.3,Aprobado
+A112,Ingeniería Civil,86,10.4,No,5.2,6.0,Aprobado
+A113,Psicología,100,7.1,,4.6,4.4,Aprobado
+A114,Psicología,81,2.8,Si,4.2,4.7,Aprobado
+A115,Psicología,74,5.1,Si,4.7,3.4,Reprobado
+A116,Psicología,63,6.2,Si,4.1,1.8,Reprobado
+A117,Contador Auditor,96,8.1,No,4.7,6.6,Aprobado
+A118,Ingeniería Comercial,100,11.9,No,5.3,4.6,Aprobado
+A119,Contador Auditor,250,8.2,No,4.5,4.5,Aprobado
+A120,Ingeniería Comercial,72,5.4,No,4.6,5.1,Aprobado
+A121,Psicología,87,7.6,No,5.4,4.1,Aprobado
+A122,Psicología,70,2.8,Si,3.9,2.0,Reprobado
+A123,Psicología,77,10.1,No,4.0,5.2,Aprobado
+A124,Ingeniería Civil,76,7.7,Si,5.5,3.8,Aprobado
+A125,Psicología,82,3.3,Si,4.6,2.5,Reprobado
+A126,Ingeniería Civil,93,8.2,Si,5.4,3.5,Aprobado
+A127,Contador Auditor,80,4.1,Si,4.6,3.2,Reprobado
+A128,Psicología,91,10.4,No,4.6,5.7,Aprobado
+A129, Contador Auditor ,75,11.9,Si,4.7,3.9,Aprobado
+A130,Ingeniería Comercial,84,6.2,No,4.9,4.8,Aprobado
+A131,Contador Auditor,54,6.5,Si,4.5,4.2,Aprobado
+A132,Psicología,63,2.7,No,3.8,4.2,Aprobado
+A133,Ingeniería Civil,90,4.0,Si,2.8,5.0,Aprobado
+A134,Contador Auditor,73,1.9,Si,3.9,4.0,Reprobado
+A135,Contador Auditor,87,9.4,Si,5.3,3.0,Reprobado
+A136,Contador Auditor,87,12.1,No,6.1,5.9,Aprobado
+A137,Psicología,96,2.1,No,5.2,4.5,Aprobado
+A138,Ingeniería Comercial,90,5.0,No,6.3,4.3,Aprobado
+A139,Psicología,92,12.4,No,6.3,4.3,Aprobado
+A140,Contador Auditor,79,6.6,No,5.4,2.9,Reprobado
+A141,Ingeniería Civil,72,3.5,No,4.7,2.7,Reprobado
+A142,Psicología,71,3.7,Si,3.3,3.1,Reprobado
+A143,Contador Auditor,74,8.2,Si,5.1,2.8,Reprobado
+A144,Ingeniería Civil,66,12.1,No,5.0,3.6,Aprobado
+A145,Psicología,73,4.6,No,3.9,3.2,Reprobado
+A146,Ingeniería Comercial,79,2.5,No,4.6,4.2,Aprobado
+A147,Ingeniería Civil,83,11.7,Si,5.4,4.1,Aprobado
+A148,Ingeniería Comercial,76,,No,4.7,4.5,Aprobado
+A149,Psicología,57,5.8,Si,3.8,3.9,Reprobado
+A150,Ingeniería Comercial,79,5.3,No,4.3,3.7,Reprobado
+A151,Ingeniería Comercial,83,13.7,No,5.4,5.5,Aprobado
+A152,Ingeniería Civil,93,4.5,Si,4.6,3.2,Reprobado
+A153,Psicología,87,9.4,No,5.4,4.9,Aprobado
+A154,Psicología,72,7.3,Si,3.3,3.6,Reprobado
+A155,Psicología,71,2.0,No,3.8,3.5,Reprobado
+A156,Ingeniería Comercial,100,7.4,No,4.3,4.6,Aprobado
+A157,Psicología,89,2.6,,4.3,3.3,Reprobado
+A158,Ingeniería Civil,100,3.6,Si,5.3,3.9,Aprobado
+A159,Contador Auditor,100,3.3,No,5.0,4.2,Aprobado
+A160,Ingeniería Civil,70,16.3,No,5.0,5.6,Aprobado
+A161,Psicología,85,13.3,No,5.4,5.7,Aprobado
+A162,Ingeniería Civil,85,3.1,Si,5.4,2.6,Reprobado
+A163,Ingeniería Civil,87,3.4,No,3.9,4.6,Aprobado
+A164,Contador Auditor,87,3.0,Si,5.1,3.3,Aprobado
+A165,Ingeniería Comercial,82,9.3,No,4.0,4.9,Aprobado
+A166,Contador Auditor,82,10.4,Si,4.7,3.8,Aprobado
+A167,Contador Auditor,62,3.9,No,4.0,2.1,Reprobado
+A168,Ingeniería Comercial,78,1.7,No,3.7,4.4,Aprobado
+A169,Ingeniería Comercial,71,,No,4.1,3.7,Reprobado
+A170,Psicología,82,1.7,Si,4.7,2.4,Reprobado
+A171,Psicología,74,8.4,No,3.9,2.6,Reprobado
+A172,Contador Auditor,87,4.5,No,4.6,3.8,Aprobado
+A173,Ingeniería Comercial,90,7.1,No,4.7,3.6,Aprobado
+A174,Ingeniería Civil,84,9.5,No,3.8,4.3,Aprobado
+A175,Psicología,84,2.8,Si,4.3,4.0,Aprobado
+A176,Psicología,81,8.2,Si,4.3,5.1,Aprobado
+A177,Ingeniería Comercial,75,15.7,No,6.0,4.6,Aprobado
+A178,Contador Auditor,78,3.5,No,3.8,4.9,Aprobado
+A179,Psicología,,6.9,Si,5.5,4.5,Aprobado
+A180,Ingeniería Comercial,85,14.9,No,5.1,4.8,Aprobado
+A181,Contador Auditor,80,8.1,No,5.9,3.0,Aprobado
+A182,Psicología,87,13.4,No,5.7,5.8,Aprobado
+A183,Ingeniería Comercial,64,2.4,No,4.1,3.7,Reprobado
+A183,Ingeniería Comercial,64,2.4,No,4.1,3.7,Reprobado
+A184,Contador Auditor,91,12.4,No,5.9,7.0,Aprobado
+A185,Ingeniería Civil,,7.3,Si,5.0,4.7,Aprobado
+A186,Ingeniería Civil,71,5.9,No,5.1,4.4,Aprobado
+A187,Ingeniería Civil,78,15.8,No,6.3,6.4,Aprobado
+A188,Ingeniería Comercial,73,6.2,No,4.2,3.0,Reprobado
+A189,Ingeniería Comercial,83,12.9,No,4.5,5.1,Aprobado
+A190,Ingeniería Comercial,73,6.5,No,2.8,3.7,Reprobado
+A191,Contador Auditor,67,9.1,No,4.2,5.4,Aprobado
+A192,Ingeniería Comercial,70,4.9,No,4.6,4.1,Aprobado
+A193,Contador Auditor,,5.3,Si,5.2,1.7,Reprobado
+A194,Ingeniería Civil,81,6.3,No,4.7,5.3,Aprobado
+A195,Ingeniería Civil,66,6.6,No,4.0,2.9,Reprobado
+A196,Ingeniería Civil,80,20.9,No,5.4,6.2,Aprobado
+A197,Ingeniería Comercial,61,8.0,No,4.0,pendiente,Reprobado
+A198,Psicología,100,,No,5.0,4.5,Aprobado
+A199,Contador Auditor,62,2.9,No,2.7,3.7,Reprobado
+A200,Contador Auditor,86,22.4,No,6.5,6.1,Aprobado
+A201,Ingeniería Civil,87,12.9,Si,4.5,3.9,Aprobado
+A202,Ingeniería Comercial,63,15.8,No,4.8,5.6,Aprobado
+A203,Ingeniería Comercial,84,1.0,Si,3.9,,Reprobado
+A204,Ingeniería Civil,92,7.5,Si,4.8,4.3,Aprobado
+A205,Psicología,86,12.3,Si,4.6,5.1,Aprobado
+A206,Ingeniería Civil,83,12.5,Si,4.5,4.0,Aprobado
+A207,Ingeniería Comercial,91,4.0,No,4.6,5.8,Aprobado
+A208,Ingeniería Comercial,82,10.7,Si,4.4,4.4,Aprobado
+A209,Contador Auditor,84,10.8,Si,6.6,4.6,Aprobado
+A210,Ingeniería Civil,78,10.5,No,4.6,4.8,Aprobado
+A211,Ingeniería Civil,88,5.1,No,4.4,3.6,Reprobado
+A212,Contador Auditor,69,7.7,No,4.1,3.0,Reprobado
+A213,Ingeniería Comercial,90,5.6,Si,4.2,4.2,Aprobado
+A214,Psicología,74,9.8,No,3.2,4.6,Aprobado
+A215,Ingeniería Civil,67,16.4,No,4.9,5.8,Aprobado
+A216,Ingeniería Civil,84,3.0,No,4.6,4.3,Aprobado
+A217,Ingeniería Comercial,100,16.0,No,5.1,4.9,Aprobado
+A218,Contador Auditor,92,3.7,No,4.8,4.7,Aprobado
+A219,Contador Auditor,74,4.2,Si,3.5,4.0,Reprobado
+A219,Contador Auditor,74,4.2,Si,3.5,4.0,Reprobado
+A220,Contador Auditor,88,15.3,No,5.5,6.1,Aprobado
+A221,Ingeniería Civil,75,7.3,No,4.7,4.3,Aprobado
+A222,Ingeniería Comercial,79,6.4,No,4.9,3.1,Reprobado
+A223,Contador Auditor,81,,No,5.3,5.6,Aprobado
+A224,Contador Auditor,52,7.1,Si,3.4,2.3,Reprobado
+A225,Ingeniería Civil,82,8.5,Si,5.4,4.5,Aprobado
+A226,Ingeniería Civil,68,19.0,No,5.0,3.7,Aprobado
+A227,Psicología,72,3.1,No,4.3,4.2,Aprobado
+A228,Ingeniería Comercial,62,3.6,No,4.3,2.6,Reprobado
+A229,Contador Auditor,62,8.1,No,4.0,4.6,Aprobado
+A230,Ingeniería Comercial,69,4.0,No,3.3,4.9,Aprobado
+A231,Ingeniería Civil,90,4.5,Si,5.1,4.9,Aprobado
+A232,Psicología,100,4.1,Si,4.4,3.3,Reprobado
+A233,Ingeniería Comercial,80,18.9,No,5.1,4.6,Aprobado
+A234,Ingeniería Comercial,93,14.8,No,5.0,4.8,Aprobado
+A235,Ingeniería Civil,77,6.1,No,5.0,4.5,Aprobado
+A236,Psicología,57,8.7,Si,4.0,3.5,Reprobado
+A237,Contador Auditor,82,11.4,No,3.7,4.9,Aprobado
+A238,Ingeniería Civil,85,12.9,No,5.7,5.2,Aprobado
+A239,Contador Auditor,75,3.2,Si,5.4,3.7,Aprobado
+A240,Ingeniería Comercial,84,7.4,No,5.9,4.9,Aprobado
+A241,Psicología,87,5.4,No,4.4,5.6,Aprobado
+A242,Psicología,70,11.5,No,4.8,4.3,Aprobado
+A243,Ingeniería Comercial,62,7.0,Si,4.4,3.3,Reprobado
+A244,Contador Auditor,77,6.0,No,5.0,2.5,Reprobado
+A245,Contador Auditor,77,2.3,No,4.2,2.6,Reprobado
+A246,Ingeniería Civil,76,3.5,No,3.6,3.2,Reprobado
+A247,Contador Auditor,92,,Si,5.3,3.0,Reprobado
+A248,Psicología,100,10.2,No,5.9,5.4,Aprobado
+A249,Contador Auditor,75,4.3,No,3.5,4.6,Aprobado
+A250,Contador Auditor,88,,No,4.5,3.9,Aprobado

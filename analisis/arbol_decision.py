@@ -15,8 +15,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
 
-# Ruta donde se guardarán los modelos (.pkl) y el registro (.json)
-RUTA_MODELOS = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'storage', 'modelos'))
+from analisis.config import RUTA_MODELOS
+
+# Registro (.json) con los metadatos de todos los modelos guardados
 ARCHIVO_REGISTRO = os.path.join(RUTA_MODELOS, 'registro_modelos.json')
 
 def asegurar_directorio_modelos():

@@ -10,6 +10,8 @@ import pandas as pd
 import io
 import csv
 
+from analisis.config import TAMANO_MAXIMO_MB, COLUMNAS_MINIMAS
+
 def validar_y_cargar_csv(archivo_subido):
     """
     RF1: Valida el formato, tamaño, codificación de caracteres y delimitador de un archivo CSV.
@@ -37,8 +39,8 @@ def validar_y_cargar_csv(archivo_subido):
     tamano_kb = round(tamano_bytes / 1024, 2)
     if tamano_bytes == 0:
         return False, "Error: El archivo está completamente vacío (0 bytes).", None, metadatos
-    if tamano_bytes > 50 * 1024 * 1024:
-        return False, "Error: El archivo supera el límite máximo de 50 MB.", None, metadatos
+    if tamano_bytes > TAMANO_MAXIMO_MB * 1024 * 1024:
+        return False, f"Error: El archivo supera el límite máximo de {TAMANO_MAXIMO_MB} MB.", None, metadatos
 
     # Leemos los bytes crudos del archivo en memoria para su posterior decodificación
     contenido_bytes = archivo_subido.getvalue()
@@ -97,7 +99,7 @@ def validar_y_cargar_csv(archivo_subido):
     # Validar que tenga al menos filas y columnas válidas
     # Un algoritmo de Machine Learning necesita al menos 2 columnas (1 predictora 'X' y 1 objetivo 'y')
     # y suficientes filas para poder encontrar patrones (aprender).
-    if df.empty or len(df.columns) < 2:
+    if df.empty or len(df.columns) < COLUMNAS_MINIMAS:
         return False, "Error: El CSV no contiene suficientes filas o columnas válidas para minería de datos.", None, metadatos
 
     # Armamos el resumen de validación para mostrarlo en la web (Data Profiling básico)

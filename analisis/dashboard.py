@@ -8,10 +8,7 @@ correlaciones, frecuencias). La capa web (app.py) se limita a dibujar los gráfi
 import pandas as pd
 import numpy as np
 
-
-def _es_id(col):
-    """Detecta columnas identificadoras (ej. 'id_cliente') que no aportan al análisis."""
-    return 'id' in str(col).split('_')
+from analisis.config import es_columna_id as _es_id
 
 
 def clasificar_columnas(df, max_categorias=25):

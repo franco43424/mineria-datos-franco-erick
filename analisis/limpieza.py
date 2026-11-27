@@ -11,6 +11,8 @@ import numpy as np
 import unicodedata
 import re
 
+from analisis.config import es_columna_id
+
 def normalizar_texto_columna(nombre):
     """
     Estandariza los nombres de las columnas para evitar errores de sintaxis y facilitar su manipulación.
@@ -129,7 +131,7 @@ def limpiar_dataset_automatico(df_original, metodo_nulos="imputar", metodo_outli
     columnas_numericas = df.select_dtypes(include=[np.number]).columns
     for col in columnas_numericas:
         # Evitar tratar los IDs (identificadores) como variables analizables
-        if 'id' in col.split('_'):
+        if es_columna_id(col):
             continue
             
         # Q1 (percentil 25) y Q3 (percentil 75)
