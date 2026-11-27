@@ -1,55 +1,101 @@
 #  Plataforma de Administración de Minería de Datos
 
-¡Bienvenido! Este proyecto es una aplicación web interactiva inspirada en **Orange Data Mining**[cite: 1]. Permite a cualquier usuario subir un archivo de datos (`.csv`), limpiarlo automáticamente sin saber programar y entrenar modelos de Inteligencia Artificial (Árboles de Decisión) de forma 100% visual[cite: 1].
+¡Bienvenido! Este proyecto es una aplicación web interactiva inspirada en **Orange Data Mining**. Permite a cualquier usuario subir un archivo de datos (`.csv`), limpiarlo automáticamente sin saber programar, entrenar Árboles de Decisión, descubrir Reglas de Asociación, explorar los datos en un Dashboard interactivo y exportar un Informe final en HTML, todo de forma 100% visual.
 
 **Equipo de Desarrollo y Roles:** 
 
 * **Franco Fajardo — Desarrollo Core, Procesamiento de Datos y Funcionalidad Web:**  
-  Encargado de la arquitectura base, programación de los motores de minería de datos en Python (`validador.py`, `limpieza.py`, `arbol_decision.py`) y estructuración funcional de la plataforma web en Streamlit según los requerimientos del sistema.
+  Encargado de la arquitectura base, programación de los motores de minería de datos en Python (`analisis/`) y estructuración funcional de la plataforma web en Streamlit (`web/vistas/`) según los requerimientos del sistema.
 
 * **Erick Mamani — Diseño de Interfaz (UI/UX), Validación y Mejora Continua:**  
-  Encargado del diseño visual personalizado (`estilos.css`), refinamiento de la experiencia de usuario en la interfaz gráfica, validación de pruebas (QA), optimización visual de métricas y documentación técnica del código fuente.
+  Encargado del diseño visual personalizado (`web/static/estilos.css`), refinamiento de la experiencia de usuario en la interfaz gráfica, validación de pruebas (QA), optimización visual de métricas y documentación técnica del código fuente.
 
 ---
 
-##  ¿Qué puedes hacer en esta plataforma? (Avance 1)
+##  ¿Qué puedes hacer en esta plataforma?
 
-1. **Subir y validar tu CSV (RF1):** Sube tu archivo y el sistema detecta solo si viene separado por comas o punto y coma, revisa el formato, las tildes y te muestra una vista previa[cite: 1].
-2. **Limpieza Automática (RF2):** Olvídate de los datos rotos[cite: 1]. El programa borra filas repetidas, rellena casillas vacías (con la mediana o la moda) y corrige números exagerados o irreales (outliers) mostrándote un resumen del antes y después[cite: 1].
-3. **Entrenar Árboles de Decisión (RF3):** Elige qué columna quieres predecir, ajusta la profundidad del árbol con un par de clics, mira el dibujo del árbol generado y revisa su calificación (Exactitud, Precisión, Recall y Matriz de Confusión)[cite: 1, 2].
-4. **Guardar y Comparar Modelos:** Guarda tus mejores árboles entrenados para compararlos en una tabla y un gráfico de barras, o elimina los que ya no necesites[cite: 2].
+La aplicación está organizada en 7 pestañas que siguen el flujo de trabajo de Orange:
+
+| Pestaña | Requerimiento | ¿Qué hace? |
+|---|---|---|
+| 1. Carga y Validación | RF1 | Sube tu CSV (o usa uno de los datasets de ejemplo de `datos/ejemplos`). El sistema detecta solo la codificación y el separador, valida formato y tamaño (máx. 50 MB) y muestra una vista previa. |
+| 2. Preprocesamiento | RF2 | Limpieza automática: normaliza nombres de columnas, borra duplicados, corrige tipos de datos, trata nulos (mediana/moda o eliminación) y outliers (IQR: acotar, mediana o eliminar), con resumen del antes y después. |
+| 3. Árbol de Decisión | RF3 | Elige la variable objetivo y las predictoras, ajusta criterio (Gini/Entropía), profundidad y % de prueba. Muestra el árbol, Exactitud, Precisión, Recall y Matriz de Confusión. |
+| 4. Historial y Comparativa | RF3 | Guarda, lista, compara (tabla + gráfico de barras) y elimina modelos entrenados. |
+| 5. Reglas de Asociación | RF4 | Configura soporte y confianza mínimos, genera reglas con **Apriori** o **FP-Growth** y revísalas con soporte, confianza y lift. Permite filtrar, ordenar, descargar, guardar, ver y eliminar resultados. |
+| 6. Dashboard | RF6 | Panel interactivo con filtros dinámicos (por categorías y rangos), indicadores, histogramas, gráficos de barras, diagramas de caja, matriz de correlación y resultados de los modelos. |
+| 7. Informe | RF5 | Genera un informe con resumen de datos, limpieza, modelos, reglas y conclusiones (automáticas + del equipo). Se descarga en **HTML**; desde el navegador se puede guardar como **PDF** (Imprimir → Guardar como PDF). |
+
+Con esto se cubren los módulos mínimos de Orange exigidos (RF7): **Datos, Preprocesamiento, Visualización, Árbol de decisión y Asociación**.
 
 ---
 
 ##  ¿Cómo está organizado el proyecto? (Arquitectura por Capas)
 
-Para mantener el orden, separamos el "cerebro matemático" de la "pantalla visual" en dos carpetas principales[cite: 2, 3]:
+Separamos el "cerebro matemático" (`analisis/`) de la "pantalla visual" (`web/`), y dejamos aparte los datos de entrada, los resultados, las pruebas y la documentación:
 
 ```text
 mineria-datos-franco-erick/
-├── analisis/                  # CEREBRO: Todo el procesamiento pesado en Python
-│   ├── __init__.py
-│   ├── validador.py           # Revisa que el CSV sea válido y detecta su separador
-│   ├── limpieza.py            # Repara vacíos, borra duplicados y corrige extremos
-│   └── arbol_decision.py      # Entrena el Árbol de Decisión, calcula notas y guarda modelos
-├── docs/
-│   └── capturas/              # Fotos de evidencia tomadas por Erick
-│       ├── rf1_carga.png
-│       ├── rf2_limpieza.png
-│       ├── rf3_arbol.png
-│       └── rf3_comparativa.png
-├── web/                       # PANTALLA: La interfaz gráfica amigable
-│   └── app.py                 # Página web interactiva creada con Streamlit (por pestañas)
-│   └── estilo.css
+├── analisis/                    # CAPA DE PROCESAMIENTO Y ANÁLISIS (Python, sin interfaz)
+│   ├── config.py                # Rutas y constantes del proyecto (un solo lugar)
+│   ├── validador.py             # RF1: Valida el CSV y detecta codificación y separador
+│   ├── limpieza.py              # RF2: Duplicados, tipos, nulos, outliers y nombres de columnas
+│   ├── arbol_decision.py        # RF3: Entrena el árbol, calcula métricas y gestiona modelos
+│   ├── asociacion.py            # RF4: Reglas de asociación (Apriori / FP-Growth) y su gestión
+│   ├── dashboard.py             # RF6: Filtros, indicadores, correlaciones y estadísticas
+│   └── informe.py               # RF5: Construye el informe HTML
 │
-├── storage/                   # MEMORIA: Donde se guardan los archivos y modelos
-│   ├── datasets/              # CSV de prueba listos para usar
-│   └── modelos/               # Historial de modelos guardados (.json y .pkl)
+├── web/                         # CAPA DE PRESENTACIÓN (Streamlit)
+│   ├── app.py                   # Punto de entrada: arma la página y las pestañas
+│   ├── vistas/                  # Una vista por pestaña (cada una con su función mostrar())
+│   │   ├── carga.py             #   1. Carga y Validación
+│   │   ├── limpieza.py          #   2. Preprocesamiento y Limpieza
+│   │   ├── arbol.py             #   3. Árbol de Decisión
+│   │   ├── historial.py         #   4. Historial y Comparativa
+│   │   ├── asociacion.py        #   5. Reglas de Asociación
+│   │   ├── dashboard.py         #   6. Dashboard
+│   │   └── informe.py           #   7. Informe
+│   ├── componentes/             # Piezas visuales compartidas
+│   │   ├── estilos.py           #   Carga del CSS y encabezado
+│   │   └── barra_lateral.py     #   Panel de estado del flujo
+│   └── static/
+│       └── estilos.css          # Diseño visual personalizado
 │
-├── requirements.txt           # Lista de librerías que usa el proyecto
-├── README.md                      # Portada e instrucciones de instalación
-└── VALIDACION_QA.md               # Reporte oficial de pruebas (Checklist del profesor)
+├── datos/                       # ENTRADAS: CSV de ejemplo
+│   ├── ejemplos/                # 5 datasets "sucios" a propósito (ver datos/LEEME.md)
+│   ├── pruebas_error/           # Archivos inválidos para probar la validación
+│   ├── generar_ejemplos.py      # Script que crea los datasets de ejemplo
+│   └── LEEME.md                 # Explicación de cada dataset y sus errores
+│
+├── storage/                     # SALIDAS: lo que genera la aplicación (no se sube a Git)
+│   ├── modelos/                 # Árboles guardados (.pkl) + registro_modelos.json
+│   └── reglas/                  # Reglas guardadas (.csv) + registro_reglas.json
+│
+├── tests/                       # PRUEBAS AUTOMÁTICAS (pytest), un archivo por requerimiento
+│   ├── test_rf1_carga.py
+│   ├── test_rf2_limpieza.py
+│   ├── test_rf3_arbol.py
+│   ├── test_rf4_asociacion.py
+│   └── test_rf5_rf6_informe_dashboard.py
+│
+├── docs/                        # DOCUMENTACIÓN
+│   ├── VALIDACION_QA.md         # Reporte de pruebas (Entrega 1 y Entrega final)
+│   ├── qa/                      # Resultados de pruebas y guía de capturas
+│   └── capturas/                # Evidencias, separadas por entrega
+│       ├── entrega1/
+│       └── entrega2/
+│
+├── requirements.txt             # Librerías del proyecto
+└── README.md                    # Este archivo
 ```
+
+**Regla de dependencias:** `web/` puede usar `analisis/`, pero `analisis/` nunca usa `web/` ni Streamlit. Por eso la capa de análisis se puede probar sola con `pytest`, sin abrir la página.
+
+### Comunicación entre capas
+
+Elegimos **Python para ambas capas** (opción permitida por el enunciado). La comunicación es mediante **importación directa de módulos**: cada vista de `web/vistas/` importa las funciones de `/analisis` (por ejemplo `limpiar_dataset_automatico()` o `generar_reglas_asociacion()`), les entrega un `DataFrame` de pandas y recibe los resultados como diccionarios/DataFrames, que luego dibuja con Plotly. La capa web **no realiza cálculos**: solo muestra y gestiona.
+
+Los resultados persistentes se intercambian como archivos: **pickle** (`.pkl`) para los modelos, **JSON** para los registros e historial y **CSV** para las reglas guardadas.
 
 ---
 
@@ -57,32 +103,36 @@ mineria-datos-franco-erick/
 
 **Python 3 (Lenguaje de programación):** Es la base del proyecto; lo elegimos por ser el estándar en Minería de Datos.   
 
-**Streamlit + CSS (Framework web y hojas de estilo):** Crean la página web y su diseño (estilos.css). Los elegimos en vez de Flask o FastAPI porque muestran tablas y gráficos de datos al instante.   
+**Streamlit + CSS (Framework web y hojas de estilo):** Crean la página web y su diseño (`web/static/estilos.css`). Los elegimos en vez de Flask o FastAPI porque muestran tablas y gráficos de datos al instante.   
 
-**Pandas y NumPy (Librerías de análisis de datos):** Funcionan como un Excel dentro del código; las usamos para leer el CSV, limpiar nulos, borrar repetidos y corregir outliers.
+**Pandas y NumPy (Librerías de análisis de datos):** Funcionan como un Excel dentro del código; las usamos para leer el CSV, limpiar nulos, borrar repetidos, corregir outliers, filtrar y calcular correlaciones.
 
 **Scikit-Learn (Librería de Machine Learning):** Es el motor de inteligencia artificial; lo usamos para entrenar el Árbol de Decisión (Gini y Entropía) y calcular sus métricas.   
 
-**Matplotlib y Plotly (Librerías de gráficos):** Matplotlib dibuja el esquema del árbol y Plotly crea los gráficos interactivos (Matriz de Confusión y barras comparativas).
+**mlxtend (Librería de reglas de asociación):** Implementa los algoritmos Apriori y FP-Growth y el cálculo de soporte, confianza y lift. Si no estuviera instalada, `asociacion.py` usa una implementación propia de Apriori como respaldo.
 
-**Joblib y JSON (Formatos de almacenamiento):** Joblib guarda el modelo entrenado en un archivo .pkl y JSON (registro_modelos.json) guarda la lista de puntajes e historial en disco.   
+**Matplotlib y Plotly (Librerías de gráficos):** Matplotlib dibuja el esquema del árbol y los gráficos del informe; Plotly crea los gráficos interactivos (matriz de confusión, comparativas, mapa de reglas y dashboard).
 
-**Git y GitHub (Control de versiones y repositorio en la nube):** Los usamos para trabajar los dos en ramas separadas (develop y main), uniendo tu código base con el diseño y las pruebas QA de Erick.
+**Pytest (Pruebas automáticas):** Verifica la capa de análisis con 40 pruebas (carpeta `tests/`).
 
+**Pickle y JSON (Formatos de almacenamiento):** `pickle` guarda el modelo entrenado en un archivo `.pkl` y JSON (`registro_modelos.json`, `registro_reglas.json`) guarda el historial en disco.   
+
+**Git y GitHub (Control de versiones y repositorio en la nube):** Trabajamos con ramas `main`, `develop` y ramas por funcionalidad, integrando el código base con el diseño y las pruebas QA.
 
 ---
 
 ##  Guía rápida: ¿Cómo instalarlo y probarlo en tu computador?
 
-Sigue estos 4 pasos en tu terminal para levantar la página web desde cero[cite: 3, 4]:
+Sigue estos 4 pasos en tu terminal para levantar la página web desde cero:
 
 **1. Descarga el proyecto desde GitHub:**
 ```bash
-git clone [https://github.com/franco43424/mineria-datos-franco-erick.git](https://github.com/franco43424/mineria-datos-franco-erick.git)
+git clone https://github.com/franco43424/mineria-datos-franco-erick.git
 cd mineria-datos-franco-erick
 ```
 
-**2. Crea y activa la "cápsula" del entorno virtual (`venv`):**
+**2. Crea y activa el entorno virtual (`venv`):**
+
  **Si estás en Mac o Linux:**
   ```bash
   python3 -m venv venv
@@ -104,3 +154,21 @@ pip install -r requirements.txt
 streamlit run web/app.py
 ```
 *(Se abrirá sola una pestaña en tu navegador en `http://localhost:8501` lista para usar).*
+
+**5. (Opcional) Ejecuta las pruebas automáticas:**
+```bash
+python -m pytest -v
+```
+Deben aparecer **40 pruebas aprobadas**. El detalle está en `docs/VALIDACION_QA.md`.
+
+---
+
+##  Flujo de uso recomendado (demo)
+
+1. **Pestaña 1:** selecciona `01_clientes_tienda.csv` en el selector de ejemplos y presiona **Cargar ejemplo** (300 clientes con datos "sucios" a propósito: duplicados, vacíos, textos en columnas numéricas y valores extremos). Hay más ejemplos explicados en [datos/LEEME.md](datos/LEEME.md).
+2. **Pestaña 2:** revisa el resumen de limpieza y prueba las distintas estrategias.
+3. **Pestaña 3:** predice `abandono_cliente`, entrena con Gini y con Entropía y guarda ambos modelos.
+4. **Pestaña 4:** compara los modelos guardados.
+5. **Pestaña 5:** genera reglas (soporte 10%, confianza 60%) y busca `abandono_cliente=Si` para ver qué perfiles se asocian al abandono. Guarda el resultado. Para el ejemplo clásico de "canasta de mercado", carga `03_compras_supermercado.csv` y activa **Ignorar valores de ausencia**.
+6. **Pestaña 6:** filtra por plan o método de pago y observa cómo cambian los gráficos.
+7. **Pestaña 7:** escribe las conclusiones del equipo, genera el informe y descárgalo en HTML.
